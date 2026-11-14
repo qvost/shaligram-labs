@@ -43,4 +43,22 @@ export function Shell({children}:{children:React.ReactNode}) {
    return () => media.revert();
  }, [path]);
  function navigate(e:React.MouseEvent<HTMLAnchorElement>,href:string){if(e.metaKey||e.ctrlKey||e.shiftKey||path===href)return;e.preventDefault();if(matchMedia('(prefers-reduced-motion: reduce)').matches){router.push(href);return}gsap.to('.curtain span',{scaleY:1,transformOrigin:'bottom',stagger:.035,duration:.35,overwrite:true,onComplete:()=>router.push(href)})}
- return <><a className="skip" href="#main">Skip to content</a><header><Link className="brand" href="/" onClick={e=>navigate(e,'/')}><LabMark/> SHALIGRAM LABS</Link><nav aria-label="Main navigation">{[['Research','/research'],['Reify','/systems/reify'],['Manifesto','/manifesto']].map(([label,url])=><Link key={url} aria-current={path===url?'page':undefined} href={url} onClick={e=>navigate(e,url)}>{label}</Link>)}<a href="https://github.com/qvost/reify" target="_blank" rel="noreferrer">GitHub</a></nav></header><LabCursor/><main id="main">{children}</main><footer><div className="footer-top"><span className="mono">Kathmandu, Nepal</span><a href="mailto:qvostwon@gmail.com">Get in touch</a></div><Link className="footer-word" href="/systems/reify">SHALIGRAM.</Link><div className="footer-bottom mono"><span>© {new Date().getFullYear()} SHALIGRAM LABS</span><a href="https://github.com/qvost/reify">Source on GitHub</a></div></footer><div ref={curtain} className="curtain" aria-hidden="true">{[0,1,2,3,4].map(i=><span key={i}/>)}</div></>}
+ return <><a className="skip" href="#main">Skip to content</a><header><Link className="brand" href="/" onClick={e=>navigate(e,'/')}><LabMark/> SHALIGRAM LABS</Link><nav aria-label="Main navigation">{[['Research','/research'],['Reify','/systems/reify'],['Manifesto','/manifesto']].map(([label,url])=><Link key={url} aria-current={path===url?'page':undefined} href={url} onClick={e=>navigate(e,url)}>{label}</Link>)}<a href="https://github.com/qvost/reify" target="_blank" rel="noreferrer">GitHub</a></nav></header><LabCursor/><main id="main">{children}</main>
+ <footer>
+   <div className="footer-top">
+     <div className="footer-credit">
+       <span className="mono muted">Designed &amp; built by</span>
+       <a className="footer-author" href="https://github.com/qvost" target="_blank" rel="noopener noreferrer">qvost<span className="mono">Siddid Pandey</span></a>
+       <span className="mono muted">Kathmandu, Nepal</span>
+     </div>
+     <ul className="footer-connections" aria-label="Connect with qvost">
+       <li><a href="https://github.com/qvost" target="_blank" rel="noopener noreferrer">GitHub <span>@qvost</span></a></li>
+       <li><a href="https://linkedin.com/in/qvost" target="_blank" rel="noopener noreferrer">LinkedIn <span>/in/qvost</span></a></li>
+       <li><a href="https://x.com/qvostlost" target="_blank" rel="noopener noreferrer">X <span>@qvostlost</span></a></li>
+       <li><a href="mailto:qvostwon@gmail.com">Email <span>qvostwon@gmail.com</span></a></li>
+     </ul>
+   </div>
+   <Link className="footer-word" href="/systems/reify">SHALIGRAM.</Link>
+   <div className="footer-bottom mono"><span>© {new Date().getFullYear()} SHALIGRAM LABS</span><a href="https://github.com/qvost/reify">Source on GitHub</a></div>
+ </footer>
+ <div ref={curtain} className="curtain" aria-hidden="true">{[0,1,2,3,4].map(i=><span key={i}/>)}</div></>}

@@ -1,8 +1,166 @@
-'use client';
-import {useEffect,useState} from 'react';
-import {BudgetScrubber} from './research-controls';
-const methods=[{name:'Visual browser-use',tokens:0,success:61,cold:'—',warm:'—'},{name:'Full static MCP',tokens:24100,success:89,cold:'Manual',warm:'420.0'},{name:'Unpruned wire server',tokens:18450,success:82.5,cold:'1,420',warm:'18.2'},{name:'Reify · browser fallback',tokens:380,success:92.5,cold:'1,280',warm:'4.1'},{name:'Reify · SSR',tokens:380,success:92.5,cold:'14.8',warm:'4.1'}];
-const apps=['Hacker News','Linear','GitHub','Stripe','Airbnb'];
-const citation='@article{pandey2026reify,\n  title={Ephemeral Tool Synthesis for Web Agents via Wire-Level Interception},\n  author={Pandey, Siddid},\n  institution={Shaligram Labs},\n  year={2026}\n}';
-export function Copy({value}:{value:string}){const [status,setStatus]=useState('Copy');return <button className="copy" onClick={async()=>{try{await navigator.clipboard.writeText(value);setStatus('Copied ✓')}catch{setStatus('Copy unavailable')}setTimeout(()=>setStatus('Copy'),2000)}} aria-live="polite">{status}</button>}
-export function Research(){const [budget,setBudget]=useState(25000),[query,setQuery]=useState(''),[sort,setSort]=useState<'name'|'success'|'tokens'>('success'),[step,setStep]=useState(0),[playing,setPlaying]=useState(false);useEffect(()=>{if(!playing)return;const t=setInterval(()=>setStep(s=>Math.min(4,s+1)),900);return()=>clearInterval(t)},[playing]);useEffect(()=>{if(step===4)setPlaying(false)},[step]);const filtered=methods.filter(m=>m.name.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>sort==='name'?a.name.localeCompare(b.name):sort==='tokens'?a.tokens-b.tokens:b.success-a.success);return <><section className="paper-hero section"><h1 className="display reveal">Ephemeral tool synthesis<br/>for web agents.</h1><p className="paper-subtitle">Via wire-level interception</p><div className="paper-meta"><span>Siddid Pandey<br/><a href="mailto:qvostwon@gmail.com">qvostwon@gmail.com</a></span><span>Shaligram Labs<br/>Kathmandu, Nepal</span><a className="button" href="/reify_paper.tex" download>Download paper source</a></div></section><div className="paper-layout"><aside className="paper-toc mono"><a href="#abstract">Abstract</a><a href="#method">Method</a><a href="#tradeoff">Trade-off curve</a><a href="#results">Evaluation</a><a href="#trace">Booking trace</a><a href="#limitations">Negative results</a><a href="#citation">Cite this work</a></aside><article className="paper-body"><section id="abstract"><h2 className="reveal">Tools at the moment of need.</h2><p>Tool definitions decide what fits in an agent’s context window. Reify synthesizes only the minimal tool set required for a goal, directly from live web application traffic. A zero-browser hydration sniffer and a headless network probe feed deterministic type induction, producing typed, stateless MCP servers on demand.</p><p>The paper reports 92.5% task completion across 20 live services, with 380 schema tokens instead of 24,100. The SSR fast path compiles in 14.8 ms; warm in-process dispatch takes 4.1 µs. These are author-reported results, not independently reproduced measurements.</p></section><section id="method"><h2>Observe. Generalize. Compile.</h2><p>First, parse embedded framework state such as __NEXT_DATA__, __NUXT_DATA__ and __remixContext. On a miss, capture JSON XHR and Fetch traffic through CDP while discarding static assets and analytics. Parameterize dynamic paths, join observed types, and mark properties optional when absent from any observation.</p><div className="equation">L(tools) + λ · task error → min</div><p>A goal-directed relevance filter retains three to five endpoints. Deterministic Rust templates bind those schemas to upstream requests, and an Axum router exposes POST /mcp. Passive telemetry watches for authentication and schema drift.</p></section><section id="tradeoff"><h2 className="reveal">The price of a tool definition.</h2><p>Move the schema budget to see which reported methods fit. Visual agents consume screenshot tokens during execution; their zero initial schema count does not represent zero total token use.</p><div className="chart"><div className="chart-y mono">Task success (%)</div><svg viewBox="0 0 620 260" role="img" aria-label="Reported success versus initial schema tokens">{[0,1,2,3].map(i=><g key={i}><line x1="40" y1={40+i*55} x2="590" y2={40+i*55} stroke="#14141418"/><text x="5" y={45+i*55} fill="#666660" fontSize="11">{100-i*15}</text></g>)}{methods.filter(m=>m.name!=='Reify · browser fallback').map(m=><g key={m.name} opacity={m.tokens>budget?.2:1}><circle cx={45+m.tokens/25000*520} cy={40+(100-m.success)*3.65} r="6" fill={m.name.includes('Reify')?'#141414':'#77776f'}/><text x={Math.min(420,55+m.tokens/25000*520)} y={30+(100-m.success)*3.65} fill="#343430" fontSize="11">{m.name}</text></g>)}<text x="180" y="245" fill="#666660" fontSize="11">Initial schema tokens</text></svg><BudgetScrubber value={budget} onChange={setBudget}/></div></section><section id="results"><h2>Measured in the wild.</h2><p>The source paper provides aggregate method results, evaluated with Claude 3.5 Sonnet. It does not publish individual app measurements or the complete 20-app roster.</p><div className="table-controls"><input aria-label="Search benchmark methods" placeholder="Search methods…" value={query} onChange={e=>setQuery(e.target.value)}/><select aria-label="Sort benchmarks" value={sort} onChange={e=>{const v=e.target.value;if(v==='name'||v==='success'||v==='tokens')setSort(v)}}><option value="success">Success ↓</option><option value="tokens">Tokens ↑</option><option value="name">Method A–Z</option></select></div><div className="table-scroll"><table><thead><tr><th>Method</th><th>Tokens</th><th>Cold ms</th><th>Warm µs</th><th>Success</th></tr></thead><tbody>{filtered.map(m=><tr key={m.name} className={m.name.includes('Reify')?'highlight':''}><td>{m.name}</td><td>{m.tokens.toLocaleString()}</td><td>{m.cold}</td><td>{m.warm}</td><td>{m.success}%</td></tr>)}</tbody></table>{!filtered.length&&<p>No methods match “{query}”.</p>}</div><details><summary>App-level data availability</summary><table><thead><tr><th>Requested service</th><th>Per-app results</th></tr></thead><tbody>{apps.map(a=><tr key={a}><td>{a}</td><td>Not supplied in paper</td></tr>)}</tbody></table><p>These services come from the platform brief; their inclusion in the evaluated suite is unconfirmed.</p></details><p className="note">Warm latency is an in-process Axum microbenchmark, not an end-to-end remote API round trip. The source’s claimed 58.2× speedup is inconsistent with its 342.3 / 4.15 µs values; we omit that ratio.</p></section><section id="trace"><h2>Same goal. A shorter path.</h2><p>An explanatory playback using the brief’s 42 s / $0.48 and 1.2 s / $0.003 totals. No recorded airline trace was included in the source paper.</p><div className="trace-grid">{[['Visual agent','42 s','$0.48'],['Reify','1.2 s','$0.003']].map((m,i)=><div key={m[0]} className="trace"><span className="mono">{m[0]}</span><strong>{(parseFloat(m[1])*step/4).toFixed(1)} s</strong><span className="green">{step===4?m[2]:'In progress'}</span><div className="progress"><span style={{width:`${step/4*100}%`}}/></div><p>{['Ready to search','Search flights','Select itinerary','Enter passenger details','Booking confirmation'][step]}</p><small>{i?'Typed requests · structured responses':'Screenshot · reason · click · repeat'}</small></div>)}</div><div className="playback"><button className="button" onClick={()=>{if(step===4)setStep(0);setPlaying(!playing)}}>{playing?'Pause':'Play trace'} {playing?'Ⅱ':'▶'}</button><button onClick={()=>{setPlaying(false);setStep(s=>Math.min(4,s+1))}}>Next step →</button><button onClick={()=>{setPlaying(false);setStep(0)}}>Reset ↺</button><span className="mono">{step} / 4</span></div></section><section id="limitations"><h2>What did not work.</h2><div className="table-scroll"><table><thead><tr><th>Variant</th><th>Success</th><th>Failure</th></tr></thead><tbody>{[['Full OpenAPI synthesis','71.4%','Token bloat; synthesis over 8 seconds'],['VLM accessibility tree','52.0%','Slow steps; brittle tree depth'],['Soft prompt gating','64.2%','Hallucinated unmounted tools'],['Fixed top-K without goal','58.0%','Telemetry displaces business APIs'],['LLM-generated handlers','68.5%','Syntax and encoding errors'],['DOM selector extraction','44.0%','Hydration invalidates selectors']].map(r=><tr key={r[0]}>{r.map(v=><td key={v}>{v}</td>)}</tr>)}</tbody></table></div><h3>Boundaries of interception</h3><p><strong>Canvas / WebGL:</strong> a canvas-only application with no underlying JSON API provides no wire surface to compile.</p><p><strong>Strict WAFs:</strong> datacenter probes may be blocked. A local companion can route through the user’s browser session; this is a dependency, not a guarantee of access.</p></section><section id="citation"><h2>Build on this work.</h2><div className="code-block"><Copy value={citation}/><pre>{citation}</pre></div><p className="note">Website metadata follows the updated Shaligram Labs brief. The downloadable original retains its earlier Reify Labs title and author affiliation.</p></section></article></div></>}
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { publications, publicationPath } from "@/lib/research";
+
+export function Research() {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All research");
+  const [sort, setSort] = useState("newest");
+  const categories = [
+    "All research",
+    ...new Set(publications.map((paper) => paper.category)),
+  ];
+  const filtered = publications
+    .filter(
+      (paper) =>
+        (category === "All research" || paper.category === category) &&
+        `${paper.name} ${paper.title} ${paper.summary} ${paper.tags.join(" ")} ${paper.author} ${paper.year}`
+          .toLowerCase()
+          .includes(query.toLowerCase().trim()),
+    )
+    .sort((a, b) =>
+      sort === "title" ? a.title.localeCompare(b.title) : b.year - a.year,
+    );
+
+  return (
+    <div className="research-index page-width">
+      <section className="archive-hero">
+        <span className="section-kicker">The research library</span>
+        <h1>
+          Ideas, made
+          <br />
+          inspectable.
+        </h1>
+        <div className="archive-intro">
+          <p>
+            Our work on the foundations of autonomous systems. Read the papers,
+            examine the evidence, and build on the code.
+          </p>
+          <span>
+            {publications.length}{" "}
+            {publications.length === 1 ? "publication" : "publications"}
+            <br />
+            Open research from Kathmandu
+          </span>
+        </div>
+      </section>
+      <section className="archive" aria-label="Publications">
+        <div className="archive-toolbar">
+          <label className="search-field">
+            <span aria-hidden="true">⌕</span>
+            <span className="sr-only">Search publications</span>
+            <input
+              type="search"
+              placeholder="Search titles, topics, authors…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </label>
+          <label className="sort-field">
+            <span className="sr-only">Sort publications</span>
+            <select
+              value={sort}
+              onChange={(event) => setSort(event.target.value)}
+            >
+              <option value="newest">Newest first</option>
+              <option value="title">Title A–Z</option>
+            </select>
+          </label>
+        </div>
+        <div
+          className="archive-filters"
+          role="group"
+          aria-label="Filter by research area"
+        >
+          {categories.map((item) => (
+            <button
+              key={item}
+              aria-pressed={category === item}
+              onClick={() => setCategory(item)}
+            >
+              {item}
+              {item === "All research" && <span>{publications.length}</span>}
+            </button>
+          ))}
+        </div>
+        <p className="results-count" role="status">
+          {filtered.length}{" "}
+          {filtered.length === 1 ? "publication" : "publications"}
+          {query && ` matching “${query}”`}
+        </p>
+        <div className="publication-list">
+          {filtered.map((paper) => (
+            <article className="publication-row" key={paper.slug}>
+              <div className="publication-year">
+                {paper.year}
+                <span>Research paper</span>
+              </div>
+              <div className="publication-info">
+                <div className="publication-meta">
+                  <span>{paper.name}</span>
+                  <span>{paper.category}</span>
+                </div>
+                <h2>
+                  <Link href={publicationPath(paper)}>{paper.title}</Link>
+                </h2>
+                <p>{paper.summary}</p>
+                <div className="publication-tags">
+                  {paper.tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+                <div className="publication-author">{paper.author}</div>
+              </div>
+              <div className="publication-actions">
+                <Link className="button" href={publicationPath(paper)}>
+                  Read paper <span aria-hidden="true">↗</span>
+                </Link>
+                <a href={paper.pdf}>
+                  PDF <span aria-hidden="true">↗</span>
+                </a>
+                {paper.source && (
+                  <a href={paper.source}>
+                    Code <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+        {!filtered.length && (
+          <div className="archive-empty">
+            <h2>No publications found.</h2>
+            <p>Try another title, topic, or author.</p>
+            <button
+              className="button"
+              onClick={() => {
+                setQuery("");
+                setCategory("All research");
+              }}
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+      </section>
+      <div className="archive-end">
+        <LabNote />
+        <a className="text-link" href="mailto:qvostwon@gmail.com">
+          Get in touch <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function LabNote() {
+  return (
+    <p>
+      Questions about the work?
+      <br />
+      <span>We welcome conversations with researchers and builders.</span>
+    </p>
+  );
+}

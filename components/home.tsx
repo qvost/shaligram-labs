@@ -1,10 +1,126 @@
-'use client';
-import Link from 'next/link';
-import {LabMark} from './lab-mark';
-import {useEffect,useRef} from 'react';
-import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
-gsap.registerPlugin(ScrollTrigger);
-const stages=[['Wire interception','Observe the signal. Drop the noise.','The hydration sniffer extracts structured state without opening Chromium. 49 visual assets never leave the socket.','GET /stories.json → 200','image · css · font → DROP'],['Dynamic path clustering','1,420 frames. Four route trees.','Integers, UUIDs and dates collapse into clean parameterized paths. Repetition becomes structure.','/api/stories/420 → /stories/{id}','/api/users/7 → /users/{id}'],['Deterministic schema induction','Types from evidence.','Draft 2020-12 JSON Schema is induced directly from observed payloads. Missing properties become optional.','{ "id": 420, "title": "…" }','→ { id: integer, title: string }'],['Stateless MCP mount','From wire to callable.','An Axum endpoint mounts task-scoped tools over Streamable HTTP. Rust handles the warm path in microseconds.','POST /mcp · tools/call','200 OK · 4.1 µs']];
-export function Wire({compact=false}:{compact?:boolean}){return <div className={`wire ${compact?'compact':''}`} aria-label="Wire traffic converging into a typed MCP tool"><div className="wire-label mono"><span>INPUT / UNSTRUCTURED WEB</span><span>OUTPUT / TYPED TOOLS</span></div><svg viewBox="0 0 1000 340" role="img" aria-label="Network packets pass through the Reify compiler"><defs><linearGradient id="wireColor"><stop stopColor="#b1b0a8"/><stop offset=".6" stopColor="#77776f"/><stop offset="1" stopColor="#343430"/></linearGradient></defs>{Array.from({length:19},(_,i)=><path key={i} className="wire-line" style={{animationDelay:`${i*-.3}s`}} d={`M -20 ${15+i*17} C 260 ${15+i*17}, 280 170, 500 170 S 740 ${110+(i%5)*30}, 1020 ${110+(i%5)*30}`} fill="none" stroke="url(#wireColor)" strokeWidth={i%4===0?1.4:.6}/>)}<circle cx="500" cy="170" r="52" fill="#e5e3dc" stroke="#77776f"/><circle cx="500" cy="170" r="42" fill="#dddbd3" stroke="#14141418"/><g transform="translate(480 150) scale(.84)"><LabMark/></g><text x="70" y="310" fill="#666660" fontSize="10" fontFamily="monospace">XHR / FETCH / HYDRATION STATE</text><text x="760" y="290" fill="#141414" fontSize="10" fontFamily="monospace">search_stories(query: string)</text></svg><div className="wire-label mono"><span>1,420 HTTP FRAMES</span><span className="green">4 TASK-SCOPED TOOLS</span></div></div>}
-export function Home(){const root=useRef<HTMLDivElement>(null);useEffect(()=>{const mm=gsap.matchMedia();mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)',()=>{const ctx=gsap.context(()=>{gsap.to('.hero-wire',{scale:.88,y:-30,scrollTrigger:{trigger:'.hero',start:'top top',end:'+=500',scrub:1,pin:true}});gsap.to('.pipeline-track',{x:()=>-(document.querySelector<HTMLElement>('.pipeline-track')!.scrollWidth-window.innerWidth+80),ease:'none',scrollTrigger:{trigger:'.pipeline',start:'top 80px',end:'+=2100',scrub:1,pin:true,invalidateOnRefresh:true}})},root);return()=>ctx.revert()});return()=>mm.revert()},[]);return <div ref={root}><section className="hero"><h1 className="lab-title reveal">SHALIGRAM LABS</h1><div className="hero-sub"><h2>THE DETERMINISTIC<br/>SUBSTRATE FOR AGENTS.</h2><div><p>We build the tools and infrastructure<br/>that connect agents to the web.</p><Link className="text-link" href="/research">Explore the research </Link></div></div><div className="hero-wire"><Wire/></div><div className="hero-bottom"><div className="badges"><span>4.1µs <b>dispatch</b></span><span>14.8ms <b>SSR compile</b></span><span>98.4% <b>token cut</b></span></div></div></section><section className="intro section"><div><h2 className="display reveal">The web is already<br/>an API. Reify it.</h2><p className="lead">Reify compiles live web traffic into typed, task-scoped tools. An agent gets the interface it needs, when it needs it.</p><Link className="button" href="/systems/reify">Meet Reify </Link><Link className="quiet-link" href="/research">Read the paper</Link></div><span className="system-mark">R</span></section><section className="pipeline"><h2 className="pipeline-title">How Reify compiles the web</h2><div className="pipeline-track">{stages.map((s,i)=><article className="pipeline-card" key={s[0]}><h3>{s[0]}</h3><div className="stage-visual"><span className="stage-number">0{i+1}</span><pre>{s[3]}<br/>{s[4]}</pre></div><h4>{s[1]}</h4><p>{s[2]}</p></article>)}</div></section><section className="section foundations"><h2 className="display reveal">Less context.<br/>More capability.</h2><div className="stack">{[['98.4%','Context eviction','24,100 static schema tokens become 380 task-scoped tokens. The remaining context stays available for the task.','01'],['4.1 µs','In-process dispatch','A pure Rust warm path. No Docker startup, Python interpreter or generated execution code.','02'],['↻','Passive self-healing','Upstream changes leave a trace. Passive telemetry detects endpoint drift and triggers schema re-synthesis.','03'],['127.0.0.1','Local session bridge','The TLS companion loopback bridge at port 9099 routes through an authentic local browser session when a remote probe is blocked.','04']].map(c=><article className="stack-card" key={c[3]}><strong>{c[0]}</strong><div><h3>{c[1]}</h3><p>{c[2]}</p></div></article>)}</div></section><section className="closing section"><h2 className="display reveal">Built to be<br/>understood.</h2><Link className="text-link" href="/manifesto">Read our manifesto</Link></section></div>}
+import Link from "next/link";
+import { LabMark } from "./lab-mark";
+import { publications, publicationPath, reify } from "@/lib/research";
+
+import { Wire } from "./wire";
+
+export function Home() {
+  return (
+    <>
+      <section className="lab-hero page-width">
+        <div className="lab-location">
+          <span>Independent research, Kathmandu</span>
+        </div>
+        <h1 className="lab-title">SHALIGRAM LABS</h1>
+        <div className="lab-hero-grid">
+          <div>
+            <h2>
+              Foundations
+              <br />
+              for autonomy.
+            </h2>
+            <p>
+              We study how intelligent agents interact with the world, and build
+              the infrastructure that makes those interactions reliable.
+            </p>
+            <Link className="button" href="/research">
+              Explore our research <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+          <div className="strata-art" aria-hidden="true">
+            <LabMark />
+          </div>
+        </div>
+        <div className="hero-foot">
+          <a href="#selected-research">
+            Discover the work <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="selected-research" className="selected-research page-width">
+        <div className="section-heading">
+          <div>
+            <span className="section-kicker">Latest research</span>
+            <h2>Making the web callable.</h2>
+          </div>
+          <Link className="text-link" href="/research">
+            All publications ({publications.length}){" "}
+            <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
+        <article className="featured-paper">
+          <div className="featured-visual">
+            <div className="featured-visual-heading">
+              <span>{reify.name}</span>
+              <span>Web → tool</span>
+            </div>
+            <Wire />
+            <div className="featured-visual-footer">
+              <span>Rust</span>
+              <span>Typed, task-scoped MCP</span>
+            </div>
+          </div>
+          <div className="featured-content">
+            <div className="publication-meta">
+              <span>{reify.category}</span>
+              <span>{reify.year}</span>
+            </div>
+            <h3>
+              <Link href={publicationPath(reify)}>
+                The right tools.
+                <br />
+                At the moment of need.
+              </Link>
+            </h3>
+            <p>{reify.summary}</p>
+            <div className="metric-strip">
+              {reify.metrics.map((metric) => (
+                <div key={metric.label}>
+                  <strong>{metric.value}</strong>
+                  <span>{metric.label}</span>
+                </div>
+              ))}
+            </div>
+            <p className="note">
+              Author-reported results from the Reify paper.
+            </p>
+            <div className="link-pair">
+              <Link className="text-link" href={publicationPath(reify)}>
+                Read the research <span aria-hidden="true">↗</span>
+              </Link>
+              {reify.system && (
+                <Link href={reify.system}>Explore the system</Link>
+              )}
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section className="lab-thesis page-width">
+        <div>
+          <span className="section-kicker">Our approach</span>
+          <h2>
+            Let models reason.
+            <br />
+            Let systems execute.
+          </h2>
+        </div>
+        <div>
+          <p>
+            Better reasoning needs a reliable connection to the world. We work
+            on small interfaces, deterministic execution, and systems that can
+            recover when their environment changes.
+          </p>
+          <p>
+            We publish the methods, measurements, and failures alongside the
+            code.
+          </p>
+          <Link className="text-link" href="/manifesto">
+            The thinking behind the lab <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
+      </section>
+    </>
+  );
+}

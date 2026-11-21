@@ -1,15 +1,32 @@
-# Component adaptation and access record
+# Component and content sources
 
-Live registry discovery was attempted through the web tool and the installed BLANK helper at `/home/qvost/.local/share/maynkudu-dotfiles/bin/blank`. Searches: `terminal tabs`, `comparison slider`, and `quiet text reveal`. All helper discovery requests failed with DNS resolution errors. Authenticated source attempts for `tabs-subtle`, `line-rise-text`, and `minimap-scrubber` also failed because the helper's credential file is absent. No live component source was downloaded or installed. The empty temporary fetch files are not vendored.
+The current interface is an original implementation for Shaligram Labs. The lab homepage uses the supplied Shaligram emblem. The archive and paper template share the publication catalog in `lib/research.ts`.
 
-The following local adaptations are implemented, without claiming they are exact registry copies:
+## Existing components retained
 
-- Integration tabs: `components/research-controls.tsx`, informed by the installed animation skill's documented `tabs-subtle.tsx` mechanism: measure selected-tab geometry and move one persistent indicator. Uses existing GSAP rather than adding a spring dependency. Supports arrow keys, Home/End, roving focus, resize observation, interruption, and reduced motion.
-- Budget scrubber: `components/research-controls.tsx`, an original native-range implementation. Continuous budget changes update the figure; presets select useful thresholds. No magnetic pointer displacement. Dimensions stay fixed while values update.
-- Thesis reveals: `components/shell.tsx`, using the saved Otis Valen source's SplitText mechanism and installed R1 masked-line recipe. Font-ready initialization, automatic responsive re-splitting, scoped GSAP cleanup, and static reduced-motion output.
+- `components/shell.tsx`: Lenis scrolling, GSAP route curtains, and reduced-motion-aware SplitText on existing reveal elements. Nested paper routes now mark Research as the active navigation item.
+- `components/lab-cursor.tsx`: existing pointer feedback, disabled for touch and reduced motion.
+- `components/research-controls.tsx`: existing measured-tab indicator and native schema-budget range control. The tabs support arrow keys, Home/End, and roving focus.
+- `components/lab-mark.tsx`: the supplied Shaligram emblem, referenced from one shared SVG asset.
 
-Local recipe references: `/home/qvost/.agents/skills/animation-fundamentals/references/construction-recipes.md` (R1) and `source-patterns.md` (measured tabs).
+## New components
 
-The site uses #e5e3dc paper, #141414 text, tone-on-tone borders and #121214 code panels. Decorative footer packets, arrows, animated dashed wires and neon glows were removed. Data-flow arrows remain where they explain the compiler.
+- `components/wire.tsx`: schematic of requests converging into typed tools; no implied measured frame count.
+- `components/benchmarks.tsx`: all six paper benchmark rows, with a budget-controlled bar comparison. Faded bars indicate methods exceeding the selected initial schema budget.
+- `components/research.tsx`: searchable publication archive with derived category filters, sorting, and an empty-results state.
+- `components/copy.tsx`: clipboard feedback with timer cleanup.
+- `app/research/[slug]/page.tsx`: static publication template with derived contents, paper links, citations, and supplementary resources.
 
-Production compilation is checked with npm. Live font requests, browser input/scroll verification, and exact registry-source integration require a working network and browser-capable environment.
+## Content and typography
+
+Reify's current PDF is `public/research/reify/paper.pdf`. The separate repository audit is `public/research/reify/performance.md`. Source scopes and implementation differences appear in the paper's measurement notes and limitations. The earlier illustrative booking trace has been removed.
+
+Barlow Condensed, Manrope, and IBM Plex Mono are self-hosted in `public/fonts/`, with their SIL Open Font Licenses. They replace the previous external typefaces, whose host returned HTTP 403 during this update.
+
+Historical BLANK-inspired recipes in the retained tab and animation controls are local adaptations. No authenticated registry component was downloaded as part of this update.
+
+## Logo assets
+
+The original supplied logo is preserved at `public/shaligram-logo.svg`. The shared emblem in `public/shaligram-mark.svg` reuses its vector paths, with the background and wordmark removed for compact use. The footer uses `public/shaligram-logo-lockup.svg`, retaining the supplied emblem and wordmark on a transparent background. The original file is not modified.
+
+`public/icon.svg`, `public/favicon.ico`, `public/apple-touch-icon.png`, and the 192/512 px app icons are derived from the same emblem. The favicon includes 16, 32, 48, and 64 px sizes. `public/site.webmanifest` references the app icons.

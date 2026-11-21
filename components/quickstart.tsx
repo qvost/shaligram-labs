@@ -1,9 +1,149 @@
-'use client';
-import {useEffect,useState} from 'react';
-import {Copy} from './research';
-import {Wire} from './home';
-import {IntegrationTabs} from './research-controls';
-const integrationTabs: Array<keyof typeof snippets> = ['Claude Code', 'Cursor / Windsurf', 'CLI'];
-const logs=['[sniffer] Reading news.ycombinator.com hydration state','[filter] 49 visual assets dropped at socket layer','[cluster] Parameterizing observed route trees','[schema] Inducing Draft 2020-12 types','[prune] Goal: search stories → 4 scoped tools','[mount] POST http://127.0.0.1:8080/mcp','[ready] search_stories(query: string)'];
-const snippets={'Claude Code':JSON.stringify({mcpServers:{reify:{type:'http',url:'http://127.0.0.1:8080/mcp'}}},null,2),'Cursor / Windsurf':JSON.stringify({mcpServers:{reify:{url:'http://127.0.0.1:8080/mcp'}}},null,2),'CLI':'cargo install reify\nreify serve --port 8080'};
-export function Quickstart(){const [count,setCount]=useState(0),[running,setRunning]=useState(false),[tab,setTab]=useState<keyof typeof snippets>('Claude Code');useEffect(()=>{if(!running)return;const t=setInterval(()=>setCount(n=>{return Math.min(n+1,logs.length)}),450);return()=>clearInterval(t)},[running]);useEffect(()=>{if(count===logs.length)setRunning(false)},[count]);return <><section className="system-hero section"><h1 className="reify-title reveal">REIFY</h1><div className="hero-sub"><h2>FROM LIVE WEB.<br/>TO TYPED TOOL.</h2><p>A Rust engine for ephemeral MCP servers.<br/>Intercept the wire. Compile the contract.<br/>Give your agent precisely what it needs.</p></div><Wire compact/></section><section className="section quickstart"><div><h2 className="display">One URL.<br/>One intent.</h2><p className="lead">See how a page becomes a task-scoped tool server.</p><span className="mono amber">Simulated session</span></div><div className="terminal"><div className="terminal-bar"><span>● ● ●</span><span>reify / local session</span><span>Rust</span></div><div className="terminal-content"><div className="command"><span className="green">❯</span> reify https://news.ycombinator.com<br/> <span className="green">"search stories"</span></div><div className="terminal-logs" aria-live="polite">{logs.slice(0,count).map((l,i)=><p key={l} className={i===6?'green':''}>{l}</p>)}{!count&&<p className="muted">Waiting for intent<span className="cursor">_</span></p>}</div><button className="button" disabled={running} onClick={()=>{setCount(0);setRunning(true)}}>{running?'Compiling…':count?'Run again':'Run simulation'}</button></div></div></section><section className="section integration"><h2 className="display reveal">A smaller interface.<br/>A faster start.</h2><p className="lead">Start the local server, then add its HTTP endpoint to your agent’s MCP configuration.</p><IntegrationTabs options={integrationTabs} value={tab} onChange={setTab} panelId="integration-panel"/><div className="code-block" role="tabpanel" id="integration-panel" aria-labelledby={`integration-tab-${integrationTabs.indexOf(tab)}`} tabIndex={0}><div className="mono muted config-path">{tab==='CLI'?'TERMINAL':tab==='Claude Code'?'~/.claude/config.json':'.cursor/mcp.json · WINDSURF: mcp_config.json'}</div><Copy value={snippets[tab]}/><pre>{snippets[tab]}</pre></div><p className="note">Configuration examples follow this platform’s requested setup; client configuration formats can vary by version. The CLI requires the Reify crate to be available in your registry; build the local Rust workspace if it is unpublished.</p><a className="text-link" href="https://github.com/qvost/reify">Explore the Rust source</a></section></>}
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { Copy } from "./copy";
+import { Wire } from "./wire";
+import { IntegrationTabs } from "./research-controls";
+
+const setup =
+  "cargo install --path crates/reify-cli\nreify serve --host 127.0.0.1 --port 8080";
+const mount = 'reify https://news.ycombinator.com "search stories"';
+const snippets = {
+  "Claude Code":
+    "reify install --agent claude --dry-run\nreify install --agent claude",
+  Cursor:
+    "reify install --agent cursor --dry-run\nreify install --agent cursor",
+  Windsurf:
+    "reify install --agent windsurf --dry-run\nreify install --agent windsurf",
+  OpenCode:
+    "reify install --agent opencode --dry-run\nreify install --agent opencode",
+};
+const clients: Array<keyof typeof snippets> = [
+  "Claude Code",
+  "Cursor",
+  "Windsurf",
+  "OpenCode",
+];
+
+const discovery = [
+  [
+    "Embedded profiles",
+    "Select from 25 curated service profiles and 39 read operations without launching a browser or making a discovery request.",
+  ],
+  [
+    "HTML and hydration",
+    "Extract structured server-rendered state or derive semantic tools for reading a static document, listing its links, or finding contact information.",
+  ],
+  [
+    "Chromium capture",
+    "When the HTTP path cannot resolve a target, capture structured traffic through Chrome DevTools Protocol and infer typed request plans.",
+  ],
+];
+
+export function Quickstart() {
+  const [client, setClient] = useState<keyof typeof snippets>("Claude Code");
+
+  return (
+    <>
+      <section className="system-hero page-width">
+        <span className="section-kicker">Research system / Rust</span>
+        <h1 className="reify-title">REIFY</h1>
+        <div className="system-intro">
+          <h2>
+            From the live web
+            <br />
+            to typed tools.
+          </h2>
+          <div>
+            <p>
+              Reify compiles task-scoped MCP tools from structured web traffic,
+              embedded profiles, and HTML documents.
+            </p>
+            <div className="link-pair">
+              <Link className="button" href="/research/reify">
+                Read the paper <span aria-hidden="true">↗</span>
+              </Link>
+              <a className="text-link" href="https://github.com/qvost/reify">
+                Browse source <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <Wire compact />
+      </section>
+      <section className="system-section page-width">
+        <div className="section-heading">
+          <h2>How discovery works.</h2>
+        </div>
+        <ol className="system-paths">
+          {discovery.map(([title, description]) => (
+            <li key={title}>
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section className="system-section page-width" id="quickstart">
+        <div className="section-heading">
+          <h2>Get started locally.</h2>
+        </div>
+        <div className="system-setup">
+          <div>
+            <h3>Start the gateway</h3>
+            <p>
+              From the root of the Reify checkout, install the CLI from source
+              and start the gateway at <code>http://127.0.0.1:8080/mcp</code>.
+            </p>
+            <div className="code-block">
+              <Copy value={setup} />
+              <pre>{setup}</pre>
+            </div>
+          </div>
+          <div>
+            <h3>Mount tools for one task</h3>
+            <p>
+              Use this command in place of the gateway to start a task-specific
+              mount. It runs in the foreground and serves <code>/mcp</code>{" "}
+              until you stop it.
+            </p>
+            <div className="code-block">
+              <Copy value={mount} />
+              <pre>{mount}</pre>
+            </div>
+          </div>
+        </div>
+        <div className="integration">
+          <h3>Connect an agent</h3>
+          <p>
+            Use <code>--dry-run</code> to preview the configuration entry. Run
+            the second command to add it to your client configuration.
+          </p>
+          <IntegrationTabs
+            options={clients}
+            value={client}
+            onChange={setClient}
+            panelId="integration-panel"
+          />
+          <div
+            className="code-block"
+            role="tabpanel"
+            id="integration-panel"
+            aria-labelledby={`integration-tab-${clients.indexOf(client)}`}
+            tabIndex={0}
+          >
+            <Copy key={client} value={snippets[client]} />
+            <pre>{snippets[client]}</pre>
+          </div>
+          <a
+            className="text-link"
+            href="https://github.com/qvost/reify/tree/main/crates/reify-cli"
+          >
+            Full CLI guide <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+    </>
+  );
+}

@@ -1,126 +1,46 @@
 # Shaligram Labs
 
-Shaligram Labs is an independent research lab based in Kathmandu, Nepal, focused on deterministic foundations and runtime infrastructure for autonomous agents.
+The website for Shaligram Labs, an independent research lab in Kathmandu working on infrastructure for autonomous agents. Built with Next.js 15, React, and TypeScript; exported as a static site.
 
-This repository contains the web platform and interactive research publication for **Reify**, an edge compiler that synthesizes ephemeral, task-scoped Model Context Protocol (MCP) servers from live web application traffic.
+## Develop
 
----
-
-## Thesis
-
-Current web agents face a structural dilemma: hand-crafting static tool definitions consumes thousands of context tokens before execution begins, while visual browser-use agents suffer from high latency, non-deterministic action spaces, and significant cost per step.
-
-Reify treats the live web as an implicit API. By intercepting HTTP and Server-Side Rendering (SSR) hydration state at the socket layer, Reify parameterizes dynamic routes and deterministically induces Draft 2020-12 JSON Schemas. Sprawling backend interfaces are pruned down to 3–5 task-scoped endpoints exposed over a stateless Streamable HTTP MCP server in Rust.
-
-```
-Unstructured Web Traffic (1,420 frames)
-   │
-   ├── [01] Wire Interception (zero-browser hydration sniffer; visual assets dropped)
-   ├── [02] Dynamic Path Clustering (UUID/integer route collapse)
-   ├── [03] Deterministic Schema Induction (Draft 2020-12 types inferred from payloads)
-   └── [04] Stateless MCP Mount (Axum Streamable HTTP endpoint)
-   │
-Task-Scoped Tools (4 tools · 380 tokens · 4.1 µs dispatch)
-```
-
-### Benchmark Summary (Author-Reported)
-
-| Metric | Visual Browser-Use | Full Static MCP | Reify (SSR) |
-| :--- | :--- | :--- | :--- |
-| **Initial Schema Tokens** | 0 | 24,100 | **380** (-98.4%) |
-| **Task Completion Rate** | 61.0% | 89.0% | **92.5%** |
-| **Cold Compilation** | — | Manual | **14.8 ms** |
-| **Warm Dispatch Latency** | — | 420.0 µs | **4.1 µs** |
-
-*Note: Aggregate evaluation conducted across 20 web applications using Claude 3.5 Sonnet. Warm latency represents in-process Axum microbenchmarks. Detailed methodology and limitations are documented in [`public/reify_paper.tex`](public/reify_paper.tex) and the interactive [`/research`](app/research/page.tsx) interface.*
-
----
-
-## Site Architecture
-
-The platform is built with the Next.js 15 App Router as a fully static export (`output: 'export'`), designed with an editorial, paper-and-stone aesthetic reflecting the Kali Gandaki shaligram stones.
-
-```
-shaligram-labs/
-├── app/
-│   ├── layout.tsx              # Root HTML shell, typography, and metadata
-│   ├── page.tsx                # Home: Hero wire visualization and compiler pipeline
-│   ├── research/               # Living paper: Interactive trade-off curve, benchmarks, citation
-│   ├── systems/reify/          # Reify compiler: Terminal simulation and agent configurations
-│   ├── manifesto/              # Core philosophy: "Intelligence scales. Foundations endure."
-│   └── globals.css             # Semantic styles, typography scale, responsive breakpoints
-├── components/
-│   ├── shell.tsx               # Lenis scroll coordination, GSAP curtain transitions, SplitText reveals
-│   ├── home.tsx                # Wire vector graphic, pinned horizontal pipeline track
-│   ├── research.tsx            # Benchmark filters, trade-off SVG scatter-plot, trace simulator
-│   ├── research-controls.tsx   # Measured-geometry IntegrationTabs and native BudgetScrubber
-│   ├── quickstart.tsx          # Terminal session replay, multi-client MCP snippets
-│   ├── lab-cursor.tsx          # Physics-damped pointer with context-aware morphing modes
-│   └── lab-mark.tsx            # SVG identity mark
-├── docs/
-│   └── component-provenance.md # Adaptation notes, accessibility verification, and design specs
-└── public/
-    └── reify_paper.tex         # LaTeX publication source
-```
-
-### Key Technical Implementations
-
-- **Lenis & ScrollTrigger Integration**: Native scroll position is continuously piped to GSAP `ScrollTrigger` instances across page transitions.
-- **Font-Ready SplitText Initialization**: Header and display typography line-masking triggers only after `document.fonts.ready` resolves, preventing layout reflow jitter.
-- **Measured Dynamic Tabs**: The agent integration switchers in `components/research-controls.tsx` measure selected DOM element geometry directly (`offsetLeft`, `offsetWidth`) and interpolate a single indicator element with full keyboard roving focus (`ArrowLeft`, `ArrowRight`, `Home`, `End`).
-- **Context-Aware Micro-Cursor**: `components/lab-cursor.tsx` runs an autonomous RAF spring loop switching between `idle`, `link` (magnetic snapping), `range`, `wire` (crosshair), and `native` input passthrough. Gracefully disables on touch devices, forced colors, and reduced motion.
-- **Accessibility & Reduced Motion**: Full keyboard navigation across all interactive tables, sliders, copy triggers, and tab lists. All animations, pinned scroll sections, and custom cursors observe `(prefers-reduced-motion: reduce)`.
-
----
-
-## Development
-
-### Prerequisites
-
-- Node.js 18.18+ or 20+
-- npm or pnpm
-
-### Getting Started
-
-```bash
-# Install dependencies
+```sh
 npm install
-
-# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Create the static export in `out/`:
 
-### Static Build & Export
-
-```bash
-# Typecheck, lint, and emit static assets to out/
+```sh
 npm run build
 ```
 
-The resulting `out/` directory can be deployed to any static host, CDN, or object store (Cloudflare Pages, Vercel, AWS S3, GitHub Pages).
+## Pages
 
----
+- `/`: lab overview, featured Reify research, and the lab's approach.
+- `/research`: searchable publication archive, with category filters and sorting.
+- `/research/[slug]`: individual papers, generated from the publication catalog.
+- `/systems/reify`: discovery paths, source installation, and client integration.
+- `/manifesto`: the lab's research philosophy.
 
-## Paper & Citation
+## Publish research
 
-The complete LaTeX manuscript is available in [`public/reify_paper.tex`](public/reify_paper.tex). If you build on this research or reference the compiler architecture, please cite:
+Add a publication to `lib/research.ts` and place its PDF and supporting artifacts in `public/research/<slug>/`. The archive, filters, counts, metadata, and static paper route use this catalog. See [the publishing guide](docs/research-publishing.md) for a complete example.
 
-```bibtex
-@article{pandey2026reify,
-  title={Ephemeral Tool Synthesis for Web Agents via Wire-Level Interception},
-  author={Pandey, Siddid},
-  institution={Shaligram Labs},
-  year={2026}
-}
-```
+The homepage features Reify as the lab's current research system. Its publication content and metrics come from the same catalog entry as the archive and paper page.
 
----
+## Reify sources
 
-## Author & Contact
+The current publication uses the supplied `REIFY_ResearchPaper.pdf`, included at `public/research/reify/paper.pdf`, and the updated local Reify workspace. All six methods from the paper's primary benchmark table are included, including the 9 µs pre-warmed profile mount.
 
-**Siddid Pandey**  
-Shaligram Labs — Kathmandu, Nepal  
-Email: [qvostwon@gmail.com](mailto:qvostwon@gmail.com)  
-Research: [https://github.com/qvost/reify](https://github.com/qvost/reify)
+Paper results are labeled as author-reported. Warm dispatch is an in-process router measurement, not upstream API latency. The paper page describes the repository audit's separate 5.9 µs median, the paper's inconsistent speedup ratio, and differences between the research description and current probe behavior. The repository performance audit is included at `public/research/reify/performance.md`.
+
+`public/reify_paper.tex` is a legacy source retained for existing links. It is not the source of the current PDF or publication data.
+
+## Typography
+
+Barlow Condensed, Manrope, and IBM Plex Mono are served locally from `public/fonts/`. Their SIL Open Font Licenses are included alongside them. The site does not depend on the previous external font host.
+
+## Logo
+
+The supplied Shaligram logo is preserved at `public/shaligram-logo.svg`. Its emblem is shared by the header, homepage, wire diagrams, manifesto, favicon, and touch/app icons. The footer uses the supplied emblem and wordmark. SVG derivatives and icon sizes are documented in [component provenance](docs/component-provenance.md).

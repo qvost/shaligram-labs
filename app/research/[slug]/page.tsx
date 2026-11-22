@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { publications, type ResearchSection } from "@/lib/research";
 import { Benchmarks } from "@/components/benchmarks";
 import { Copy } from "@/components/copy";
+import { PaperNavigation } from "@/components/paper-navigation";
 
 export function generateStaticParams() {
   return publications.map((paper) => ({ slug: paper.slug }));
@@ -96,7 +97,7 @@ export default async function Page({
           <span>{paper.category}</span>
           <span>Research paper / {paper.year}</span>
         </div>
-        <h1>{paper.title}</h1>
+        <h1 data-motion-title>{paper.title}</h1>
         <div className="paper-meta">
           <div>
             <strong>{paper.author}</strong>
@@ -133,32 +134,27 @@ export default async function Page({
         )}
       </section>
       <div className="paper-layout page-width">
-        <aside className="paper-toc">
-          <span>In this paper</span>
-          <a href="#abstract">Abstract</a>
-          {paper.sections.map((section) => (
-            <a key={section.id} href={`#${section.id}`}>
-              {section.title}
-            </a>
-          ))}
-          <a href="#citation">Citation & resources</a>
-        </aside>
+        <PaperNavigation items={[
+          { id: "abstract", title: "Abstract" },
+          ...paper.sections.map(({ id, title }) => ({ id, title })),
+          { id: "citation", title: "Citation and resources" },
+        ]} />
         <article className="paper-body">
           <section id="abstract">
             <span className="section-kicker">Abstract</span>
-            <h2>{paper.abstractTitle}</h2>
+            <h2 data-motion-title>{paper.abstractTitle}</h2>
             {paper.abstract.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
           </section>
           {paper.sections.map((section) => (
             <section id={section.id} key={section.id}>
-              <h2>{section.title}</h2>
+              <h2 data-motion-title>{section.title}</h2>
               <SectionContent section={section} />
             </section>
           ))}
           <section id="citation">
-            <h2>Build on this work.</h2>
+            <h2 data-motion-title>Cite the paper.</h2>
             <div className="code-block">
               <Copy value={paper.citation} />
               <pre>{paper.citation}</pre>

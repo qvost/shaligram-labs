@@ -44,8 +44,27 @@ export type Publication = {
   citation: string;
 };
 
+export const reifyMetrics = {
+  schemaTokens: {
+    value: "98.4%",
+    label: "fewer schema tokens",
+    context: "380 vs 24,100",
+  },
+  taskCompletion: {
+    value: "92.5%",
+    label: "task completion",
+    context: "vs 61.0% visual",
+  },
+  warmDispatch: {
+    value: "4.1 µs",
+    label: "warm in-process dispatch",
+    context: "Axum microbenchmark",
+  },
+  profileMount: { value: "9 µs", label: "profile mount" },
+};
+
 export const reify: Publication = {
-  abstractTitle: "Tools at the moment of need.",
+  abstractTitle: "How Reify compiles tools for a task.",
   resources: [
     {
       label: "Read the repository performance audit",
@@ -57,7 +76,7 @@ export const reify: Publication = {
   title:
     "Ephemeral Tool Synthesis for Web Agents with a Wire-Level Description Price",
   summary:
-    "Compile the web into small, typed interfaces. Give agents the tools their task needs, at the moment they need them.",
+    "Reify compiles task-specific MCP tools from website data and network traffic.",
   year: 2026,
   category: "Agent infrastructure",
   tags: ["Tool synthesis", "MCP", "Web agents"],
@@ -66,12 +85,12 @@ export const reify: Publication = {
   source: "https://github.com/qvost/reify",
   system: "/systems/reify",
   metrics: [
-    { value: "98.4%", label: "fewer schema tokens" },
-    { value: "92.5%", label: "task completion" },
-    { value: "9 µs", label: "profile mount" },
+    reifyMetrics.schemaTokens,
+    reifyMetrics.taskCompletion,
+    reifyMetrics.profileMount,
   ],
   abstract: [
-    "Tool definitions decide what fits in an agent’s context window. Reify asks whether an agent can synthesize only the tools it needs for its current goal, while preserving execution fidelity.",
+    "Tool definitions use space in an agent's context window. Reify synthesizes tools for the current task and measures their schema size, execution cost, and task completion.",
     "An embedded wire-profile catalog, a zero-browser hydration scanner, and a headless network probe feed deterministic schema induction. A goal-directed filter narrows the interface to three to five tools, served through a stateless MCP gateway in Rust.",
     "Across 20 live production web applications, the paper reports 380 initial schema tokens instead of 24,100, with 92.5% task completion versus 89.0% for full static MCP servers. Pre-warmed profiles mount in 9 µs; the SSR path takes 14.8 ms; warm in-process calls take 4.1 µs.",
   ],
@@ -79,7 +98,7 @@ export const reify: Publication = {
     {
       kind: "text",
       id: "method",
-      title: "From a website to a callable contract.",
+      title: "How compilation works.",
       paragraphs: [
         "First, resolve a matching pre-warmed profile. On a miss, fetch HTML and extract embedded state such as __NEXT_DATA__, __NUXT_DATA__, __remixContext, or __INITIAL_STATE__. When this path cannot resolve the target, a Chrome DevTools Protocol probe captures structured traffic while filtering static assets and trackers.",
         "Dynamic path segments become parameters. A deterministic type join infers JSON Schema from observed payloads, making a property optional when it is missing from any observation. A relevance filter retains the endpoints that match the task.",
@@ -89,7 +108,7 @@ export const reify: Publication = {
     {
       kind: "benchmarks",
       id: "evaluation",
-      title: "Less context. Higher task completion.",
+      title: "Schema size and task completion.",
       description:
         "Table 1 of the supplied paper. Aggregate evaluation across 20 live web services using Claude 3.5 Sonnet; these are author-reported results.",
       rows: [
@@ -146,7 +165,7 @@ export const reify: Publication = {
     {
       kind: "text",
       id: "implementation",
-      title: "The implementation, today.",
+      title: "Implementation.",
       paragraphs: [
         "The current Rust workspace includes 25 embedded service profiles and 39 read operations. Matching and mounting do not make network requests; executing a tool still depends on the upstream API, its access rules, and any required credentials.",
         "The updated implementation also recognizes static HTML documents and exposes semantic read, link, and contact tools. Hydration snapshots are projections of an HTML response; they are not evidence of a separate JSON API.",
@@ -178,17 +197,17 @@ export const reify: Publication = {
     {
       kind: "text",
       id: "measurement-notes",
-      title: "Reading the measurements.",
+      title: "Measurement scope.",
       paragraphs: [
         "Warm dispatch is an in-process Axum router measurement. It excludes browser startup, network sockets, upstream API calls, and retries. The 9 µs profile figure excludes process startup, catalog initialization, and socket binding. Neither figure describes an end-to-end remote task.",
-        "The repository’s separate performance audit reports a median of run averages of 5.9 µs after optimization, versus 342.3 µs before, across five alternating runs per side. Its optimized range is 4.2–6.1 µs. The paper uses 4.1 µs; these measurements have different reporting scopes and are presented separately here.",
+        "The repository's separate performance audit reports a median of run averages of 5.9 µs after optimization, versus 342.3 µs before, across five alternating runs per side. Its optimized range is 4.2 to 6.1 µs. The paper uses 4.1 µs; these measurements have different reporting scopes and are presented separately here.",
         "The paper’s stated 58.2× speedup does not follow from its paired 342.3 µs and 4.15 µs figures, so this site does not repeat that ratio. The paper does not provide individual app results or a complete service roster. Zero initial schema tokens for visual agents does not imply zero screenshot or execution tokens.",
       ],
     },
     {
       kind: "text",
       id: "limitations",
-      title: "Where the approach stops.",
+      title: "Limitations.",
       paragraphs: [
         "Canvas and WebGL applications with no underlying structured traffic provide no API surface for interception. Anti-bot systems can block remote discovery; a local companion depends on an accessible, explicitly shared user session.",
         "The paper describes autonomous form interaction. The current probe documentation describes navigation and capture rather than goal-driven clicking. The benchmark labels above preserve the paper’s terminology; they do not assert that every research behavior is implemented in the current source.",

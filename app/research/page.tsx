@@ -2,7 +2,7 @@ import { Research } from "@/components/research";
 export const metadata = {
   title: "Research",
   description:
-    "Open research from Shaligram Labs. Papers, measurements, and code on the foundations of autonomous systems.",
+    "Research on web agents from Shaligram Labs. Read the Reify paper and inspect its measurements and source code.",
 };
 export default function Page() {
   return <Research />;

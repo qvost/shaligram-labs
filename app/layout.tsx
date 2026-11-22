@@ -4,11 +4,11 @@ import { Shell } from "@/components/shell";
 
 export const metadata: Metadata = {
   title: {
-    default: "Shaligram Labs — Foundations for autonomy",
+    default: "Shaligram Labs | Web agent research",
     template: "%s · Shaligram Labs",
   },
   description:
-    "Shaligram Labs, Kathmandu. Tools and infrastructure for agents, starting with Reify.",
+    "Research on web agents from Kathmandu. Reify compiles task-specific MCP tools from websites.",
   manifest: "/site.webmanifest",
   icons: {
     icon: [

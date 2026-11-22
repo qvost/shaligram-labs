@@ -28,15 +28,15 @@ export function Research() {
     <div className="research-index page-width">
       <section className="archive-hero">
         <span className="section-kicker">The research library</span>
-        <h1>
-          Ideas, made
+        <h1 data-motion-title>
+          Research on
           <br />
-          inspectable.
+          web agents.
         </h1>
         <div className="archive-intro">
           <p>
-            Our work on the foundations of autonomous systems. Read the papers,
-            examine the evidence, and build on the code.
+            Read the Reify paper, compare its reported results, and inspect
+            the implementation.
           </p>
           <span>
             {publications.length}{" "}
@@ -65,7 +65,7 @@ export function Research() {
               onChange={(event) => setSort(event.target.value)}
             >
               <option value="newest">Newest first</option>
-              <option value="title">Title A–Z</option>
+              <option value="title">Title A to Z</option>
             </select>
           </label>
         </div>
@@ -88,7 +88,7 @@ export function Research() {
         <p className="results-count" role="status">
           {filtered.length}{" "}
           {filtered.length === 1 ? "publication" : "publications"}
-          {query && ` matching “${query}”`}
+          {query && ` matching "${query}"`}
         </p>
         <div className="publication-list">
           {filtered.map((paper) => (
@@ -148,7 +148,7 @@ export function Research() {
       <div className="archive-end">
         <LabNote />
         <a className="text-link" href="mailto:qvostwon@gmail.com">
-          Get in touch <span aria-hidden="true">↗</span>
+          Email the lab <span aria-hidden="true">↗</span>
         </a>
       </div>
     </div>
@@ -158,9 +158,7 @@ export function Research() {
 function LabNote() {
   return (
     <p>
-      Questions about the work?
-      <br />
-      <span>We welcome conversations with researchers and builders.</span>
+      Send us research questions or implementation feedback.
     </p>
   );
 }

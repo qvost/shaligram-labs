@@ -1,18 +1,22 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 import Lenis from "lenis";
 import { LabMark } from "./lab-mark";
 import { LabCursor } from "./lab-cursor";
-gsap.registerPlugin(ScrollTrigger, SplitText);
+import { usePageCurtain } from "./use-page-curtain";
+import { usePageMotion } from "./use-page-motion";
+
+gsap.registerPlugin(ScrollTrigger);
 export function Shell({ children }: { children: React.ReactNode }) {
-  const path = usePathname(),
-    router = useRouter(),
-    curtain = useRef<HTMLDivElement>(null);
+  const path = usePathname();
+  const curtain = useRef<HTMLDivElement>(null);
+  const main = useRef<HTMLElement>(null);
+  const navigate = usePageCurtain(curtain, path);
+  usePageMotion(main, path);
   useEffect(() => {
     const mm = gsap.matchMedia();
     let lenis: Lenis | undefined;
@@ -32,83 +36,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
     });
     return () => mm.revert();
   }, []);
-  useEffect(() => {
-    const media = gsap.matchMedia();
-    media.add("(prefers-reduced-motion: no-preference)", () => {
-      const animations = gsap.context(() => {
-        gsap.fromTo(
-          ".curtain span",
-          { scaleY: 1 },
-          {
-            scaleY: 0,
-            transformOrigin: "top",
-            stagger: 0.035,
-            duration: 0.55,
-            ease: "power3.inOut",
-            overwrite: true,
-          },
-        );
-      });
-      let disposed = false;
-      const splits: SplitText[] = [];
-      document.fonts.ready.then(() => {
-        if (disposed) return;
-        animations.add(() => {
-          document.querySelectorAll(".reveal").forEach((element) => {
-            const split = SplitText.create(element, {
-              type: "lines",
-              mask: "lines",
-              autoSplit: true,
-              onSplit(self) {
-                return gsap.from(self.lines, {
-                  yPercent: 105,
-                  stagger: 0.08,
-                  duration: 0.65,
-                  ease: "power3.out",
-                  scrollTrigger: {
-                    trigger: element,
-                    start: "top 90%",
-                    once: true,
-                  },
-                });
-              },
-            });
-            splits.push(split);
-          });
-          ScrollTrigger.refresh();
-        });
-      });
-      return () => {
-        disposed = true;
-        animations.revert();
-        splits.forEach((split) => split.revert());
-      };
-    });
-    return () => media.revert();
-  }, [path]);
-  function navigate(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || path === href) return;
-    e.preventDefault();
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      router.push(href);
-      return;
-    }
-    gsap.to(".curtain span", {
-      scaleY: 1,
-      transformOrigin: "bottom",
-      stagger: 0.035,
-      duration: 0.35,
-      overwrite: true,
-      onComplete: () => router.push(href),
-    });
-  }
   return (
     <>
       <a className="skip" href="#main">
         Skip to content
       </a>
       <header>
-        <Link className="brand" href="/" onClick={(e) => navigate(e, "/")}>
+        <Link className="brand" href="/" onNavigate={(e) => navigate(e, "/")}>
           <LabMark /> SHALIGRAM LABS
         </Link>
         <nav aria-label="Main navigation">
@@ -123,7 +57,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 path === url || path.startsWith(`${url}/`) ? "page" : undefined
               }
               href={url}
-              onClick={(e) => navigate(e, url)}
+              onNavigate={(e) => navigate(e, url)}
             >
               {label}
             </Link>
@@ -138,7 +72,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </nav>
       </header>
       <LabCursor />
-      <main id="main">{children}</main>
+      <main id="main" ref={main}>{children}</main>
       <footer>
         <div className="footer-top">
           <div className="footer-credit">

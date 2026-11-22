@@ -1,6 +1,6 @@
 export function Wire({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`wire ${compact ? "compact" : ""}`}>
+    <div className={`wire ${compact ? "compact" : ""}`} data-motion-wire>
       <div className="wire-label">
         <span>Web traffic</span>
         <span>Task-scoped tools</span>
@@ -14,6 +14,7 @@ export function Wire({ compact = false }: { compact?: boolean }) {
           <path
             key={index}
             className="wire-line"
+            pathLength={1}
             d={`M 0 ${20 + index * 16} C 270 ${20 + index * 16}, 310 150, 500 150 S 750 ${100 + (index % 4) * 34}, 1000 ${100 + (index % 4) * 34}`}
             fill="none"
             stroke="currentColor"

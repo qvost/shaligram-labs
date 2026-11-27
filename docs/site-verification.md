@@ -2,6 +2,14 @@
 
 Verified the production static export locally with Chromium 156.0.8078.4.
 
+## Landing page refinement
+
+Rechecked the revised homepage and research library at 1440, 390, and 320 pixels. The homepage has three sections: the lab introduction, one short Reify preview, and the lab's approach. Product explorers, benchmark tables, metrics, and the pinned compilation pipeline are absent from the landing page. The research library lists publications and downloads; detailed evaluation remains in the individual paper.
+
+All revised layouts passed overflow, image, heading, unique-ID, palette, and browser-error checks. Links from the landing page to the Reify system, paper, and manifesto worked. The protocol explorer and pipeline remain on the system page; the paper retains its benchmark evaluation, SVG plot, booking trace, and negative results. Normal-motion review confirmed the landing page has no pinned product sequence and the interactive mark still renders.
+
+The final production build and lint checks passed. Current landing-page screenshots are in `/tmp/shaligram-landing-review/`; earlier screenshots below document the preceding full-site verification.
+
 ## Build gates
 
 - `npm run lint`: passed with zero errors and zero warnings, using Next.js core web vitals and TypeScript rules.

@@ -18,8 +18,8 @@ npm run lint
 
 ## Pages
 
-- `/`: lab overview, featured Reify research, protocol explorer, scroll-driven compilation pipeline, and latency comparison.
-- `/research`: searchable publication archive, PDF/LaTeX downloads, and reproducible benchmark evaluation.
+- `/`: Shaligram Labs introduction, a concise preview of current work, and the lab's approach.
+- `/research`: searchable publication library and PDF/LaTeX downloads.
 - `/research/[slug]`: individual papers with schema-budget controls, SVG tradeoff plot, searchable aggregate benchmark table, illustrative booking playback, negative results, and citation copy.
 - `/systems/reify`: protocol/discovery inspectors, benchmark comparison, production architecture, CLI/Rust/Python/TypeScript examples, and agent integration.
 - `/manifesto`: the lab's research philosophy.
@@ -28,7 +28,7 @@ npm run lint
 
 Add a publication to `lib/research.ts` and place its PDF and supporting artifacts in `public/research/<slug>/`. The archive, filters, counts, metadata, and static paper route use this catalog. See [the publishing guide](docs/research-publishing.md) for a complete example.
 
-The homepage features Reify as the lab's current research system. Its publication content and metrics come from the same catalog entry as the archive and paper page.
+The homepage introduces the lab and links to its work. Reify's protocol explorer, compilation pipeline, architecture, benchmarks, and setup belong on `/systems/reify`; detailed evaluations and research widgets belong on `/research/reify`. The project preview uses the shared publication catalog.
 
 ## Reify sources
 

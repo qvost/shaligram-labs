@@ -1,12 +1,7 @@
 import Link from "next/link";
+import { publicationPath, reify } from "@/lib/research";
 import { InteractiveMark } from "./interactive-mark";
-import { publications, publicationPath, reify } from "@/lib/research";
-
 import { Wire } from "./wire";
-import { ProtocolExplorer } from "./protocol-explorer";
-import { LatencyBench } from "./latency-bench";
-import { CompilationPipeline } from "./compilation-pipeline";
-import { SystemCapabilities } from "./system-capabilities";
 
 export function Home() {
   return (
@@ -21,14 +16,13 @@ export function Home() {
         <div className="lab-hero-grid">
           <div>
             <h2 data-motion-title>
-              Tools for
+              Research for
               <br />
               web agents.
             </h2>
             <p>
-              We study how agents use websites. Our first system, Reify,
-              compiles the tools an agent needs from live APIs, real-time
-              streams, and static documents.
+              We investigate how agents use the web, then build the
+              infrastructure that makes those interactions reliable.
             </p>
             <Link className="button" href="/research">
               Explore our research <span aria-hidden="true">↗</span>
@@ -38,7 +32,7 @@ export function Home() {
         </div>
         <div className="hero-foot">
           <a href="#selected-research">
-            Read about Reify <span aria-hidden="true">↓</span>
+            Selected work <span aria-hidden="true">↓</span>
           </a>
         </div>
       </section>
@@ -46,108 +40,64 @@ export function Home() {
       <section id="selected-research" className="selected-research page-width">
         <div className="section-heading">
           <div>
-            <span className="section-kicker">Latest research</span>
-            <h2 data-motion-title>The Reify paper.</h2>
+            <span className="section-kicker">Selected work</span>
+            <h2 data-motion-title>Research in practice.</h2>
           </div>
           <Link className="text-link" href="/research">
-            All publications ({publications.length}){" "}
-            <span aria-hidden="true">↗</span>
+            Research library <span aria-hidden="true">↗</span>
           </Link>
         </div>
-        <article className="featured-paper">
+        <article className="featured-paper lab-project">
           <div className="featured-visual">
             <div className="featured-visual-heading">
-              <span>{reify.name}</span>
+              <span>Live web</span>
               <span>Web → tool</span>
             </div>
             <Wire />
             <div className="featured-visual-footer">
-              <span>Rust</span>
-              <span>Typed, task-scoped MCP</span>
+              <span>Observe</span>
+              <span>Compile</span>
             </div>
           </div>
           <div className="featured-content">
             <div className="publication-meta">
-              <span>{reify.category}</span>
+              <span>Open source system</span>
               <span>{reify.year}</span>
             </div>
             <h3>
-              <Link href={publicationPath(reify)}>
-                Compile tools
-                <br />
-                from live websites.
-              </Link>
+              <Link href="/systems/reify">{reify.name}</Link>
             </h3>
-            <p>{reify.summary}</p>
-            <div className="metric-strip">
-              {reify.metrics.map((metric) => (
-                <div key={metric.label}>
-                  <strong>{metric.value}</strong>
-                  <span>{metric.label}</span>
-                </div>
-              ))}
-            </div>
-            <p className="note">
-              Author-reported results from the Reify paper.
+            <p>
+              Our first system turns live websites into focused tools for
+              agents, giving each task an interface it can use.
             </p>
             <div className="link-pair">
-              <Link className="text-link" href={publicationPath(reify)}>
-                Read the research <span aria-hidden="true">↗</span>
+              <Link className="text-link" href="/systems/reify">
+                Explore Reify <span aria-hidden="true">↗</span>
               </Link>
-              {reify.system && (
-                <Link href={reify.system + "#discovery"}>
-                  Explore discovery
-                </Link>
-              )}
+              <Link className="text-link" href={publicationPath(reify)}>
+                Read the paper <span aria-hidden="true">↗</span>
+              </Link>
             </div>
           </div>
         </article>
       </section>
 
-      <section className="system-section page-width" id="protocols">
-        <div className="section-heading">
-          <h2 data-motion-title>
-            Many protocols.
-            <br />
-            One useful interface.
-          </h2>
-          <Link className="text-link" href="/systems/reify">
-            Explore Reify ↗
-          </Link>
-        </div>
-        <ProtocolExplorer />
-      </section>
-      <CompilationPipeline />
-      <section className="system-section page-width" id="bench">
-        <div className="section-heading">
-          <h2 data-motion-title>Inspect the measured path.</h2>
-          <a className="text-link" href="/paper.pdf" download>
-            Download Research Paper (PDF) ↗
-          </a>
-        </div>
-        <LatencyBench />
-      </section>
-      <section className="system-section page-width">
-        <div className="section-heading">
-          <h2 data-motion-title>Built past the first request.</h2>
-        </div>
-        <SystemCapabilities />
-      </section>
-
       <section className="lab-thesis page-width">
         <div>
           <span className="section-kicker">Our approach</span>
-          <h2 data-motion-title>How we work.</h2>
+          <h2 data-motion-title>
+            Built to be
+            <br />
+            understood.
+          </h2>
         </div>
         <div>
           <p>
-            We build small, typed interfaces for agent tasks. When an upstream
-            API changes, Reify can compile a new interface.
+            We develop working systems and publish the evidence behind them:
+            code, methods, measurements, and the approaches that failed.
           </p>
-          <p>
-            We publish the methods, measurements, and failures alongside the
-            code.
-          </p>
+          <p>Our work is open to inspection, use, and further research.</p>
           <Link className="text-link" href="/manifesto">
             Read our manifesto <span aria-hidden="true">↗</span>
           </Link>

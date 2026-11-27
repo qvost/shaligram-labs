@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s · Shaligram Labs",
   },
   description:
-    "Research on web agents from Kathmandu. Reify compiles task-specific MCP tools from websites.",
+    "Shaligram Labs is an independent research lab in Kathmandu building open tools and infrastructure for web agents.",
   manifest: "/site.webmanifest",
   icons: {
     icon: [

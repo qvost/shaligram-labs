@@ -2,6 +2,8 @@
 
 The current interface is an original implementation for Shaligram Labs. The lab homepage uses the supplied Shaligram emblem. The archive and paper template share the publication catalog in `lib/research.ts`.
 
+The landing page presents Shaligram Labs, one concise project preview, and the lab's approach. The technical protocol explorer, horizontal compilation pipeline, and system architecture live on `/systems/reify`. `/research` is the publication library; the full evaluation and interactive research figures live on `/research/reify`. Product statistics and technical demos are kept off the lab landing page.
+
 ## Existing components retained
 
 - `components/shell.tsx`: Lenis scrolling, GSAP route curtains, and reduced-motion-aware SplitText on existing reveal elements. Nested paper routes now mark Research as the active navigation item.

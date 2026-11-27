@@ -77,7 +77,7 @@ export function DiscoveryExplorer() {
   return (
     <div className="discovery-explorer">
       <p className="discovery-instruction" id={id + "-instruction"}>
-        Choose an example to trace Reify's resolution order.
+        Choose an example to trace Reify’s resolution order.
       </p>
       <ol
         className="system-paths discovery-options"

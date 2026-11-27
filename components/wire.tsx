@@ -30,7 +30,7 @@ export function Wire({ compact = false }: { compact?: boolean }) {
           stroke="currentColor"
         />
         <use
-          href="/shaligram-mark.svg#shaligram-symbol"
+          href="/brand/mark.svg#shaligram-symbol"
           transform="translate(468 118) scale(.15238)"
         />
       </svg>

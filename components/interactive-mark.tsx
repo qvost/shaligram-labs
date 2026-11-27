@@ -5,14 +5,15 @@ import AsciiLogo from "./ui/ascii-logo";
 export function InteractiveMark() {
   return (
     <figure className="ascii-brand">
-      <img className="ascii-brand-fallback" src="/shaligram-mark.svg" alt="" />
+      <img className="ascii-brand-fallback" src="/brand/mark.svg" alt="" />
       <AsciiLogo
-        src="/assets/ascii-logo/shaligram-mark.svg"
+        src="/brand/mark.svg"
         background="var(--surface)"
-        gridColor="#efede5"
-        charColor="#202320"
+        gridColor="#e5e3dc"
+        charColor="#141414"
         chars=":+*#%@0369"
         threshold={0.12}
+        sampleMode="alpha"
         cellSize={4}
         cellGap={1}
         mobileCellSize={3}
@@ -24,7 +25,9 @@ export function InteractiveMark() {
       />
       <figcaption>
         <span>Shaligram</span>
-        <span className="ascii-brand-hint" aria-hidden="true">Move across the mark</span>
+        <span className="ascii-brand-hint" aria-hidden="true">
+          Move across the mark
+        </span>
       </figcaption>
     </figure>
   );

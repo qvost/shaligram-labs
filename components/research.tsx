@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { publications, publicationPath } from "@/lib/research";
+import { publications, publicationPath, reify } from "@/lib/research";
+import { LatencyBench } from "./latency-bench";
 
 export function Research() {
   const [query, setQuery] = useState("");
@@ -35,8 +36,8 @@ export function Research() {
         </h1>
         <div className="archive-intro">
           <p>
-            Read the Reify paper, compare its reported results, and inspect
-            the implementation.
+            Read the Reify paper, compare its reported results, and inspect the
+            multi-protocol compiler, transport, and native bindings.
           </p>
           <span>
             {publications.length}{" "}
@@ -44,6 +45,14 @@ export function Research() {
             <br />
             Open research from Kathmandu
           </span>
+        </div>
+        <div className="link-pair research-downloads">
+          <a className="button" href={reify.pdf} download>
+            Download Research Paper (PDF) <span aria-hidden="true">↓</span>
+          </a>
+          <a className="text-link" href="/reify_paper.tex" download>
+            Download LaTeX Source <span aria-hidden="true">↓</span>
+          </a>
         </div>
       </section>
       <section className="archive" aria-label="Publications">
@@ -145,6 +154,49 @@ export function Research() {
           </div>
         )}
       </section>
+      <section
+        className="system-section research-evaluation"
+        id="reproducible-bench"
+      >
+        <div className="section-heading">
+          <h2 data-motion-title>
+            Reproducible <code>reify bench</code>
+            <br />
+            evaluation.
+          </h2>
+        </div>
+        <p className="evaluation-intro">
+          Inspect the verified local Chromium comparison, then read the full
+          paper for the schema-budget scrubber, tradeoff curve, 20-service
+          aggregate comparison, booking trace, and negative results.
+        </p>
+        <LatencyBench />
+        <div className="research-notes">
+          <div>
+            <h3>Beyond REST and JSON.</h3>
+            <p>
+              GraphQL introspection and SSE/WS subscriptions, binary/text
+              gRPC-Web (+proto/+json), real-time WebSocket tools, and sequential
+              ExecutionSpec workflow macros extend the same compiler. Static
+              pages receive read_document, list_links, get_contact_points, MCP
+              Resources, and Prompts.
+            </p>
+          </div>
+          <div>
+            <h3>Transport has its own boundary.</h3>
+            <p>
+              Pooled HTTP/3 and replay-safe QUIC 0-RTT, dual-stack Happy
+              Eyeballs, UDP-blackhole fallback, concurrent SWR caching, tenant
+              isolation, and opt-in OTLP/Prometheus are implementation
+              capabilities. The local HTTP fixture does not benchmark QUIC or
+              WAN behavior.
+            </p>
+          </div>
+        </div>
+        <Link className="text-link" href={publicationPath(reify)}>
+          Open the complete interactive paper ↗
+        </Link>
+      </section>
       <div className="archive-end">
         <LabNote />
         <a className="text-link" href="mailto:qvostwon@gmail.com">
@@ -156,9 +208,5 @@ export function Research() {
 }
 
 function LabNote() {
-  return (
-    <p>
-      Send us research questions or implementation feedback.
-    </p>
-  );
+  return <p>Send us research questions or implementation feedback.</p>;
 }

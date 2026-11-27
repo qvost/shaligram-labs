@@ -31,6 +31,8 @@ export interface AsciiLogoProps {
   chars?: string;
   /** Brightness (0–1) a sampled pixel must clear to become a glyph. */
   threshold?: number;
+  /** Use opacity when sampling a dark mark on a transparent background. */
+  sampleMode?: "brightness" | "alpha";
   /** Cell size / gap in px (desktop, then below mobileBreakpoint). */
   cellSize?: number;
   cellGap?: number;
@@ -68,6 +70,7 @@ export default function AsciiLogo({
   charColor = "#dadada",
   chars = ".:+*#%@0369",
   threshold = 0.5,
+  sampleMode = "brightness",
   cellSize = 8,
   cellGap = 2,
   mobileCellSize = 3,
@@ -131,8 +134,6 @@ export default function AsciiLogo({
       sampleCanvas.height = logoRows;
       const sampleCtx = sampleCanvas.getContext("2d");
       if (!sampleCtx) return;
-      sampleCtx.fillStyle = "#000";
-      sampleCtx.fillRect(0, 0, logoCols, logoRows);
       sampleCtx.drawImage(logoImg, 0, 0, logoCols, logoRows);
       const { data } = sampleCtx.getImageData(0, 0, logoCols, logoRows);
 
@@ -149,10 +150,12 @@ export default function AsciiLogo({
           if (inLogo) {
             const idx = ((row - startRow) * logoCols + (col - startCol)) * 4;
             const brightness =
-              (data[idx] * 0.299 +
-                data[idx + 1] * 0.587 +
-                data[idx + 2] * 0.114) /
-              255;
+              sampleMode === "alpha"
+                ? data[idx + 3] / 255
+                : (data[idx] * 0.299 +
+                    data[idx + 1] * 0.587 +
+                    data[idx + 2] * 0.114) /
+                  255;
             isLit = brightness > threshold;
             char = isLit
               ? chars[
@@ -200,7 +203,14 @@ export default function AsciiLogo({
     };
 
     const init = () => {
-      if (disposed || !logoImg.complete || !logoImg.naturalWidth || !root.clientWidth || !root.clientHeight) return;
+      if (
+        disposed ||
+        !logoImg.complete ||
+        !logoImg.naturalWidth ||
+        !root.clientWidth ||
+        !root.clientHeight
+      )
+        return;
       setupCanvas();
       sampleLogoIntoCells();
       renderFrame();
@@ -246,7 +256,9 @@ export default function AsciiLogo({
     const tick = 1000 / 60;
     const animationLoop = (time: number) => {
       if (disposed) return;
-      accumulatedTime += previousTime ? Math.min(50, time - previousTime) : tick;
+      accumulatedTime += previousTime
+        ? Math.min(50, time - previousTime)
+        : tick;
       previousTime = time;
       while (accumulatedTime >= tick) {
         updatePhysics();
@@ -286,7 +298,11 @@ export default function AsciiLogo({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         reset();
-      } else if ((event.key === "Enter" || event.key === " ") && !event.repeat && !reduced.matches) {
+      } else if (
+        (event.key === "Enter" || event.key === " ") &&
+        !event.repeat &&
+        !reduced.matches
+      ) {
         event.preventDefault();
         mouse.col = cols / 2;
         mouse.row = rows / 2;
@@ -372,6 +388,7 @@ export default function AsciiLogo({
     charColor,
     chars,
     threshold,
+    sampleMode,
     cellSize,
     cellGap,
     mobileCellSize,

@@ -6,6 +6,19 @@ import { BudgetScrubber } from "./research-controls";
 
 export function Benchmarks({ rows }: { rows: Benchmark[] }) {
   const [budget, setBudget] = useState(25000);
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<"success" | "tokens" | "name">("success");
+  const filtered = rows
+    .filter((row) =>
+      row.name.toLowerCase().includes(query.toLowerCase().trim()),
+    )
+    .sort((a, b) =>
+      sort === "name"
+        ? a.name.localeCompare(b.name)
+        : sort === "tokens"
+          ? a.tokens - b.tokens
+          : b.success - a.success,
+    );
   return (
     <>
       <div className="evidence-chart">
@@ -38,6 +51,32 @@ export function Benchmarks({ rows }: { rows: Benchmark[] }) {
           agents still consume tokens during execution.
         </p>
       </div>
+      <div className="benchmark-controls">
+        <label>
+          <span className="sr-only">Search benchmark methods</span>
+          <input
+            type="search"
+            placeholder="Search methods…"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </label>
+        <label>
+          <span className="sr-only">Sort benchmarks</span>
+          <select
+            value={sort}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (value === "success" || value === "tokens" || value === "name")
+                setSort(value);
+            }}
+          >
+            <option value="success">Success ↓</option>
+            <option value="tokens">Tokens ↑</option>
+            <option value="name">Method A–Z</option>
+          </select>
+        </label>
+      </div>
       <div
         className="table-scroll"
         tabIndex={0}
@@ -58,7 +97,7 @@ export function Benchmarks({ rows }: { rows: Benchmark[] }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {filtered.map((row) => (
               <tr
                 key={row.name}
                 className={row.family === "reify" ? "highlight" : ""}
@@ -73,6 +112,10 @@ export function Benchmarks({ rows }: { rows: Benchmark[] }) {
           </tbody>
         </table>
       </div>
+      <p className="note" role="status">
+        {filtered.length} of {rows.length} benchmark methods
+        {query && ` matching “${query}”`}.
+      </p>
       <p className="note">
         Cold mount and warm call measure different operations. Warm calls
         exclude upstream network I/O. See measurement notes for the separate

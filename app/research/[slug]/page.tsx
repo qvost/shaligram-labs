@@ -5,6 +5,8 @@ import { publications, type ResearchSection } from "@/lib/research";
 import { Benchmarks } from "@/components/benchmarks";
 import { Copy } from "@/components/copy";
 import { PaperNavigation } from "@/components/paper-navigation";
+import { BookingTrace, TradeoffCurve } from "@/components/research-figures";
+import { LatencyBench } from "@/components/latency-bench";
 
 export function generateStaticParams() {
   return publications.map((paper) => ({ slug: paper.slug }));
@@ -25,6 +27,12 @@ export async function generateMetadata({
 
 function SectionContent({ section }: { section: ResearchSection }) {
   switch (section.kind) {
+    case "tradeoff":
+      return <TradeoffCurve />;
+    case "trace":
+      return <BookingTrace />;
+    case "latency":
+      return <LatencyBench />;
     case "text":
       return section.paragraphs.map((paragraph) => (
         <p key={paragraph}>{paragraph}</p>
@@ -104,9 +112,21 @@ export default async function Page({
             <span>Shaligram Labs, Kathmandu</span>
           </div>
           <div className="paper-resources">
-            <a className="button" href={paper.pdf}>
-              Read PDF <span aria-hidden="true">↗</span>
+            <a className="button" href={paper.pdf} download>
+              Download Research Paper (PDF) <span aria-hidden="true">↓</span>
             </a>
+            {paper.resources
+              .filter((resource) => resource.href.endsWith(".tex"))
+              .map((resource) => (
+                <a
+                  className="text-link"
+                  href={resource.href}
+                  key={resource.href}
+                  download
+                >
+                  {resource.label} <span aria-hidden="true">↓</span>
+                </a>
+              ))}
             {paper.source && (
               <a className="text-link" href={paper.source}>
                 Source code <span aria-hidden="true">↗</span>
@@ -134,11 +154,13 @@ export default async function Page({
         )}
       </section>
       <div className="paper-layout page-width">
-        <PaperNavigation items={[
-          { id: "abstract", title: "Abstract" },
-          ...paper.sections.map(({ id, title }) => ({ id, title })),
-          { id: "citation", title: "Citation and resources" },
-        ]} />
+        <PaperNavigation
+          items={[
+            { id: "abstract", title: "Abstract" },
+            ...paper.sections.map(({ id, title }) => ({ id, title })),
+            { id: "citation", title: "Citation and resources" },
+          ]}
+        />
         <article className="paper-body">
           <section id="abstract">
             <span className="section-kicker">Abstract</span>

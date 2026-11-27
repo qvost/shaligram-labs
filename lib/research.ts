@@ -9,6 +9,7 @@ export type Benchmark = {
 
 export type ResearchSection =
   | { kind: "text"; id: string; title: string; paragraphs: string[] }
+  | { kind: "tradeoff" | "trace" | "latency"; id: string; title: string }
   | {
       kind: "benchmarks";
       id: string;
@@ -56,16 +57,22 @@ export const reifyMetrics = {
     context: "vs 61.0% visual",
   },
   warmDispatch: {
-    value: "4.1 µs",
+    value: "4.15 µs",
     label: "warm in-process dispatch",
     context: "Axum microbenchmark",
   },
-  profileMount: { value: "9 µs", label: "profile mount" },
+  profileMount: { value: "9.0 µs", label: "profile mount" },
+  verification: { tests: 710, clippyWarnings: 0, date: "27 Nov 2026" },
 };
 
 export const reify: Publication = {
   abstractTitle: "How Reify compiles tools for a task.",
   resources: [
+    { label: "Download LaTeX Source", href: "/reify_paper.tex" },
+    {
+      label: "Reproducible benchmark method",
+      href: "/research/reify/benchmarks.md",
+    },
     {
       label: "Read the repository performance audit",
       href: "/research/reify/performance.md",
@@ -76,12 +83,12 @@ export const reify: Publication = {
   title:
     "Ephemeral Tool Synthesis for Web Agents with a Wire-Level Description Price",
   summary:
-    "Reify compiles task-specific MCP tools from website data and network traffic.",
+    "Reify compiles REST, GraphQL, gRPC-Web, WebSocket, and document interfaces into typed, task-scoped MCP tools.",
   year: 2026,
   category: "Agent infrastructure",
-  tags: ["Tool synthesis", "MCP", "Web agents"],
+  tags: ["Tool synthesis", "MCP", "Multi-protocol", "Web agents"],
   author: "Siddid Pandey",
-  pdf: "/research/reify/paper.pdf",
+  pdf: "/paper.pdf",
   source: "https://github.com/qvost/reify",
   system: "/systems/reify",
   metrics: [
@@ -91,8 +98,8 @@ export const reify: Publication = {
   ],
   abstract: [
     "Tool definitions use space in an agent's context window. Reify synthesizes tools for the current task and measures their schema size, execution cost, and task completion.",
-    "An embedded wire-profile catalog, a zero-browser hydration scanner, and a headless network probe feed deterministic schema induction. A goal-directed filter narrows the interface to three to five tools, served through a stateless MCP gateway in Rust.",
-    "Across 20 live production web applications, the paper reports 380 initial schema tokens instead of 24,100, with 92.5% task completion versus 89.0% for full static MCP servers. Pre-warmed profiles mount in 9 µs; the SSR path takes 14.8 ms; warm in-process calls take 4.1 µs.",
+    "An embedded wire-profile catalog, a zero-browser hydration scanner, and a headless network probe feed deterministic Draft 2020-12 schema induction. REST/JSON, GraphQL, gRPC-Web, WebSocket streams, and sequential workflows share a stateless MCP interface. Static documents receive semantic tools, Resources, and Prompts rather than an empty tool set.",
+    "Across 20 live production web applications, the paper reports 380 initial schema tokens instead of 24,100, with 92.5% task completion versus 89.0% for full static MCP servers. Pre-warmed profiles mount in 9.0 µs; the SSR path takes 14.8 ms; in-process router dispatch takes 4.15 µs. A separate reproducible loopback benchmark measures 0.804 ms p50 HTTP MCP dispatch versus 3.331 ms for scripted Chromium.",
   ],
   sections: [
     {
@@ -102,8 +109,14 @@ export const reify: Publication = {
       paragraphs: [
         "First, resolve a matching pre-warmed profile. On a miss, fetch HTML and extract embedded state such as __NEXT_DATA__, __NUXT_DATA__, __remixContext, or __INITIAL_STATE__. When this path cannot resolve the target, a Chrome DevTools Protocol probe captures structured traffic while filtering static assets and trackers.",
         "Dynamic path segments become parameters. A deterministic type join infers JSON Schema from observed payloads, making a property optional when it is missing from any observation. A relevance filter retains the endpoints that match the task.",
-        "The resulting request plans mount behind POST /mcp. Cached definitions avoid repeated compilation. Progressive Server-Sent Events support streaming responses, while passive drift signals and a canary watch command support recovery when upstream behavior changes.",
+        "The resulting request plans mount behind POST /mcp. Sequential workflow macros compile bounded ExecutionSpec chains, passing extracted fields into later steps through one atomic MCP tool interface. Steps execute in order and can report partial progress; upstream mutations are not transactional.",
+        "GraphQL introspection, queries, mutations, SSE and graphql-transport-ws subscriptions sit alongside binary/text gRPC-Web codecs (+proto/+json) and real-time WebSocket stream tools. When no relevant API frames exist, read_document, list_links, and get_contact_points expose the page, including Cloudflare email decoding, reify:// Resources, and task Prompts. Successful synthesis never returns tools: [].",
       ],
+    },
+    {
+      kind: "tradeoff",
+      id: "tradeoff",
+      title: "The price of a tool definition.",
     },
     {
       kind: "benchmarks",
@@ -163,13 +176,21 @@ export const reify: Publication = {
       ],
     },
     {
+      kind: "latency",
+      id: "reproducible-bench",
+      title: "Reproducible reify bench evaluation.",
+    },
+    { kind: "trace", id: "trace", title: "Same goal. A shorter path." },
+    {
       kind: "text",
       id: "implementation",
       title: "Implementation.",
       paragraphs: [
         "The current Rust workspace includes 25 embedded service profiles and 39 read operations. Matching and mounting do not make network requests; executing a tool still depends on the upstream API, its access rules, and any required credentials.",
-        "The updated implementation also recognizes static HTML documents and exposes semantic read, link, and contact tools. Hydration snapshots are projections of an HTML response; they are not evidence of a separate JSON API.",
-        "The reify install command merges the gateway into Cursor, Claude Code, Windsurf, and OpenCode configurations. A loopback bridge accepts explicitly shared browser credentials, scoped to the appropriate host. The reify watch command compares live captures for drift and supports webhook notifications.",
+        "The reify-transport crate pools HTTP/1.1, HTTP/2, and HTTP/3 connections, with replay-safe QUIC 0-RTT early data for eligible anonymous reads. Credentials, bodies, and mutations are excluded from early flight. Dual-stack Happy Eyeballs dialing and UDP-blackhole fallback preserve reachability.",
+        "HTTP-aware concurrent Stale-While-Revalidate caching and adaptive circuit breaking manage upstream load. A 64-partition multi-tenant Auth Vault isolates credentials using --tenant-tokens and X-Reify-Tenant. OpenTelemetry OTLP export and Prometheus /metrics are opt-in.",
+        "Native Python (PyO3 abi3) and TypeScript (NAPI-RS) bindings call the Rust compiler and transport in-process. Build the source packages locally; the bindings are not published to PyPI or npm. The signed Community Profile Registry supports reify pull with configured trust; no hosted public registry is assumed.",
+        "The reify install command merges the gateway into Cursor, Claude Code, Windsurf, and OpenCode configurations. A loopback bridge accepts explicitly shared browser credentials, scoped to the appropriate host. The reify watch canary daemon detects upstream drift and supports self-healing. The November 27 release verification reports 710 passing workspace tests and zero Clippy warnings.",
       ],
     },
     {
@@ -199,9 +220,10 @@ export const reify: Publication = {
       id: "measurement-notes",
       title: "Measurement scope.",
       paragraphs: [
-        "Warm dispatch is an in-process Axum router measurement. It excludes browser startup, network sockets, upstream API calls, and retries. The 9 µs profile figure excludes process startup, catalog initialization, and socket binding. Neither figure describes an end-to-end remote task.",
-        "The repository's separate performance audit reports a median of run averages of 5.9 µs after optimization, versus 342.3 µs before, across five alternating runs per side. Its optimized range is 4.2 to 6.1 µs. The paper uses 4.1 µs; these measurements have different reporting scopes and are presented separately here.",
-        "The paper’s stated 58.2× speedup does not follow from its paired 342.3 µs and 4.15 µs figures, so this site does not repeat that ratio. The paper does not provide individual app results or a complete service roster. Zero initial schema tokens for visual agents does not imply zero screenshot or execution tokens.",
+        "The 4.15 µs in-process Axum router microbenchmark excludes browser startup, network sockets, upstream API calls, and retries. The 9.0 µs profile figure excludes process startup, catalog initialization, and socket binding. Neither figure describes an end-to-end remote task.",
+        "The paper reports a 58.2× optimization speedup. The separate repository audit measures a median of run averages of 5.9 µs after optimization versus 342.3 µs before, across five alternating runs per side, with an optimized range of 4.2–6.1 µs. The 58.2× claim and the 4.15 µs microbenchmark have different reporting scopes; the ratio cannot be derived from 342.3 / 4.15.",
+        "The November 27 reify bench run uses a Fat-LTO release binary, five alternating trials, 100 warm calls per side, 100 ms pacing, 10 warmups, and 25 discovery calls. All 200 timed calls complete with zero errors and matching full-result hashes. HTTP MCP measures 0.804 / 0.959 ms p50 / p95; scripted Chromium measures 3.331 / 3.877 ms. No WAN, TLS, QUIC, model inference, or screenshot loop is measured.",
+        "The single-form benchmark retains 866 MCP context tokens versus 536 DOM tokens and classifies 18/20 inputs versus 20/20. These are different representations and a separate workload from the 20-app paper evaluation. The paper does not provide individual app measurements or a complete service roster. Zero initial schema tokens for visual agents does not imply zero screenshot or execution tokens.",
       ],
     },
     {

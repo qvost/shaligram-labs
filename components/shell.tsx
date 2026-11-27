@@ -72,7 +72,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </nav>
       </header>
       <LabCursor />
-      <main id="main" ref={main}>{children}</main>
+      <main id="main" ref={main}>
+        {children}
+      </main>
       <footer>
         <div className="footer-top">
           <div className="footer-credit">
@@ -123,12 +125,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </ul>
         </div>
         <Link className="footer-logo" href="/" aria-label="Shaligram Labs home">
-          <img
-            src="/shaligram-logo-lockup.svg"
-            alt=""
-            width="176"
-            height="204"
-          />
+          <img src="/brand/logo.svg" alt="" width="176" height="204" />
         </Link>
         <div className="footer-bottom mono">
           <span>© {new Date().getFullYear()} SHALIGRAM LABS</span>

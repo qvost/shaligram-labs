@@ -9,11 +9,13 @@ export function IntegrationTabs<T extends string>({
   value,
   onChange,
   panelId,
+  label = "Agent integration",
 }: {
   options: T[];
   value: T;
   onChange: (value: T) => void;
   panelId: string;
+  label?: string;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const indicator = useRef<HTMLSpanElement>(null);
@@ -36,7 +38,9 @@ export function IntegrationTabs<T extends string>({
           if (!active) return;
           gsap.to(marker, {
             x: active.offsetLeft,
+            y: active.offsetTop - 4,
             width: active.offsetWidth,
+            height: active.offsetHeight,
             duration:
               context.conditions?.reduced || !initialized.current ? 0 : 0.24,
             ease: "power3.out",
@@ -63,14 +67,14 @@ export function IntegrationTabs<T extends string>({
       ref={root}
       className="integration-tabs"
       role="tablist"
-      aria-label="Agent integration"
+      aria-label={label}
     >
       <span ref={indicator} className="tab-indicator" aria-hidden="true" />
       {options.map((option, index) => (
         <button
           key={option}
           role="tab"
-          id={`integration-tab-${index}`}
+          id={`${panelId}-tab-${index}`}
           aria-controls={panelId}
           aria-selected={value === option}
           tabIndex={value === option ? 0 : -1}

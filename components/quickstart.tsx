@@ -1,12 +1,46 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { publicationPath, reify, reifyMetrics } from "@/lib/research";
 import { Copy } from "./copy";
 import { Wire } from "./wire";
 import { IntegrationTabs } from "./research-controls";
 import { DiscoveryExplorer } from "./discovery-explorer";
+import { ProtocolExplorer } from "./protocol-explorer";
+import { LatencyBench } from "./latency-bench";
+import { SystemCapabilities } from "./system-capabilities";
+import { CompilationPipeline } from "./compilation-pipeline";
+
+const nativeExamples = {
+  CLI: {
+    code: 'reify https://news.ycombinator.com "search stories"\nreify profiles\nreify watch --help',
+    href: "crates/reify-cli",
+    note: "Install the CLI from the repository, then mount a task or inspect available profiles and canary options.",
+  },
+  Rust: {
+    code: 'use reify_core::domain::{AuthContext, Target};\nuse reify_synth::SynthEngine;\n\nlet target = Target::new("https://example.com", Some("read docs".into()))?;\nlet catalog = SynthEngine::new().synthesize(\n    &target, &[], &AuthContext::default(),\n)?;\n// No captures: semantic document tools. No network I/O.',
+    href: "crates/reify-synth",
+    note: "Use the workspace crates directly. Empty captures produce document tools; synthesis itself makes no upstream request.",
+  },
+  "Python (PyO3)": {
+    code: 'import json\nimport reify\n\ncatalog = json.loads(reify.synthesize_json(\n    "https://example.com", "[]", "read docs"\n))\nprint(catalog["tools"])',
+    href: "bindings/python",
+    note: "Build and install the abi3 wheel from bindings/python first. Compiler inputs and outputs are explicit UTF-8 JSON strings.",
+  },
+  "TypeScript (NAPI-RS)": {
+    code: 'import { synthesizeJson } from "@shaligram/reify";\n\nconst catalogJson = synthesizeJson(\n  "https://example.com", "[]", "read docs"\n);\n// JSON string returned by the native Rust compiler.\nconsole.log(catalogJson);',
+    href: "bindings/node",
+    note: "Build and install the native source package in bindings/node first. The package includes generated TypeScript declarations.",
+  },
+};
+type Language = keyof typeof nativeExamples;
+const languages: Language[] = [
+  "CLI",
+  "Rust",
+  "Python (PyO3)",
+  "TypeScript (NAPI-RS)",
+];
 
 const setup =
   "cargo install --path crates/reify-cli && reify serve --host 127.0.0.1 --port 8080";
@@ -36,12 +70,18 @@ const metrics = [
 
 export function Quickstart() {
   const [client, setClient] = useState<keyof typeof snippets>("Claude Code");
+  const [language, setLanguage] = useState<Language>("CLI");
+  const id = useId();
+  const nativePanelId = `${id}-native`;
+  const integrationPanelId = `${id}-integration`;
 
   return (
     <>
       <section className="system-hero page-width">
         <span className="section-kicker">Research system / Rust</span>
-        <h1 className="reify-title" data-motion-title>REIFY</h1>
+        <h1 className="reify-title" data-motion-title>
+          REIFY
+        </h1>
         <div className="system-intro">
           <h2 data-motion-title>
             From the live web
@@ -51,8 +91,9 @@ export function Quickstart() {
           <div>
             <p>
               Reify is an on-demand compiler for task-scoped MCP tools. It
-              checks a pre-warmed cache first, then compiles tools from the live
-              site when there is no match.
+              checks 25 pre-warmed wire profiles first, then compiles REST,
+              GraphQL, gRPC-Web, WebSocket, or static-document tools from the
+              live site when there is no match.
             </p>
             <div className="link-pair">
               <Link className="button" href={publicationPath(reify)}>
@@ -78,11 +119,30 @@ export function Quickstart() {
         <p className="note">Author-reported results from the Reify paper.</p>
         <Wire compact />
       </section>
+      <section className="system-section page-width" id="protocols">
+        <div className="section-heading">
+          <h2 data-motion-title>A protocol for every surface.</h2>
+        </div>
+        <ProtocolExplorer />
+      </section>
       <section className="system-section page-width" id="discovery">
         <div className="section-heading">
           <h2 data-motion-title>Three tiers of discovery.</h2>
         </div>
         <DiscoveryExplorer />
+      </section>
+      <CompilationPipeline />
+      <section className="system-section page-width" id="bench">
+        <div className="section-heading">
+          <h2 data-motion-title>Measure the actual boundary.</h2>
+        </div>
+        <LatencyBench />
+      </section>
+      <section className="system-section page-width" id="architecture">
+        <div className="section-heading">
+          <h2 data-motion-title>The system around the tool.</h2>
+        </div>
+        <SystemCapabilities />
       </section>
       <section className="system-section page-width" id="quickstart">
         <div className="section-heading">
@@ -113,6 +173,37 @@ export function Quickstart() {
             </div>
           </div>
         </div>
+        <div className="integration native-integration">
+          <h3>Choose your entry point</h3>
+          <p>
+            The CLI and native bindings use the same Rust core. Python and Node
+            packages are available as source builds.
+          </p>
+          <IntegrationTabs
+            options={languages}
+            value={language}
+            onChange={setLanguage}
+            panelId={nativePanelId}
+            label="Code language"
+          />
+          <div
+            className="code-block"
+            role="tabpanel"
+            id={nativePanelId}
+            aria-labelledby={`${nativePanelId}-tab-${languages.indexOf(language)}`}
+            tabIndex={0}
+          >
+            <Copy key={language} value={nativeExamples[language].code} />
+            <pre>{nativeExamples[language].code}</pre>
+          </div>
+          <p className="note">{nativeExamples[language].note}</p>
+          <a
+            className="text-link"
+            href={`${reify.source}/tree/main/${nativeExamples[language].href}`}
+          >
+            Build and API guide ↗
+          </a>
+        </div>
         <div className="integration">
           <h3>Connect an agent</h3>
           <p>
@@ -123,13 +214,13 @@ export function Quickstart() {
             options={clients}
             value={client}
             onChange={setClient}
-            panelId="integration-panel"
+            panelId={integrationPanelId}
           />
           <div
             className="code-block"
             role="tabpanel"
-            id="integration-panel"
-            aria-labelledby={`integration-tab-${clients.indexOf(client)}`}
+            id={integrationPanelId}
+            aria-labelledby={`${integrationPanelId}-tab-${clients.indexOf(client)}`}
             tabIndex={0}
           >
             <Copy key={client} value={snippets[client]} />

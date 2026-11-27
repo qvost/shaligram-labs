@@ -3,6 +3,10 @@ import { InteractiveMark } from "./interactive-mark";
 import { publications, publicationPath, reify } from "@/lib/research";
 
 import { Wire } from "./wire";
+import { ProtocolExplorer } from "./protocol-explorer";
+import { LatencyBench } from "./latency-bench";
+import { CompilationPipeline } from "./compilation-pipeline";
+import { SystemCapabilities } from "./system-capabilities";
 
 export function Home() {
   return (
@@ -11,7 +15,9 @@ export function Home() {
         <div className="lab-location">
           <span>Independent research, Kathmandu</span>
         </div>
-        <h1 className="lab-title" data-motion-title>SHALIGRAM LABS</h1>
+        <h1 className="lab-title" data-motion-title>
+          SHALIGRAM LABS
+        </h1>
         <div className="lab-hero-grid">
           <div>
             <h2 data-motion-title>
@@ -21,7 +27,8 @@ export function Home() {
             </h2>
             <p>
               We study how agents use websites. Our first system, Reify,
-              compiles the tools an agent needs for a specific task.
+              compiles the tools an agent needs from live APIs, real-time
+              streams, and static documents.
             </p>
             <Link className="button" href="/research">
               Explore our research <span aria-hidden="true">↗</span>
@@ -88,24 +95,54 @@ export function Home() {
                 Read the research <span aria-hidden="true">↗</span>
               </Link>
               {reify.system && (
-                <Link href={reify.system + "#discovery"}>Explore discovery</Link>
+                <Link href={reify.system + "#discovery"}>
+                  Explore discovery
+                </Link>
               )}
             </div>
           </div>
         </article>
       </section>
 
+      <section className="system-section page-width" id="protocols">
+        <div className="section-heading">
+          <h2 data-motion-title>
+            Many protocols.
+            <br />
+            One useful interface.
+          </h2>
+          <Link className="text-link" href="/systems/reify">
+            Explore Reify ↗
+          </Link>
+        </div>
+        <ProtocolExplorer />
+      </section>
+      <CompilationPipeline />
+      <section className="system-section page-width" id="bench">
+        <div className="section-heading">
+          <h2 data-motion-title>Inspect the measured path.</h2>
+          <a className="text-link" href="/paper.pdf" download>
+            Download Research Paper (PDF) ↗
+          </a>
+        </div>
+        <LatencyBench />
+      </section>
+      <section className="system-section page-width">
+        <div className="section-heading">
+          <h2 data-motion-title>Built past the first request.</h2>
+        </div>
+        <SystemCapabilities />
+      </section>
+
       <section className="lab-thesis page-width">
         <div>
           <span className="section-kicker">Our approach</span>
-          <h2 data-motion-title>
-            How we work.
-          </h2>
+          <h2 data-motion-title>How we work.</h2>
         </div>
         <div>
           <p>
-            We build small, typed interfaces for agent tasks. When an
-            upstream API changes, Reify can compile a new interface.
+            We build small, typed interfaces for agent tasks. When an upstream
+            API changes, Reify can compile a new interface.
           </p>
           <p>
             We publish the methods, measurements, and failures alongside the
